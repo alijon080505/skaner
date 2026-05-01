@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Sariosiyo — QR Skaner</title>
+<title>Sariosiyo — QR Skaner Pro</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
@@ -19,6 +19,7 @@
   --green: #1ED760;
   --yellow: #F5A623;
   --blue: #4A9EFF;
+  --purple: #A855F7;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -56,6 +57,8 @@ body{
   color:white;
   font-size:0.72rem;font-weight:600;
   padding:5px 12px;border-radius:20px;
+  cursor:pointer;
+  transition:all .2s;
 }
 
 /* ── TABS ── */
@@ -123,11 +126,9 @@ body{
 }
 @keyframes scanline{0%{top:8%}50%{top:88%}100%{top:8%}}
 
-/* found flash */
 .cam-wrap.found{animation:flashgreen .4s ease}
 @keyframes flashgreen{0%,100%{box-shadow:0 0 0 1px var(--border)}50%{box-shadow:0 0 0 3px var(--green), 0 0 30px rgba(30,215,96,0.4)}}
 
-/* cam-status */
 .cam-status{
   position:absolute;bottom:0;left:0;right:0;
   background:linear-gradient(transparent,rgba(0,0,0,0.85));
@@ -159,7 +160,7 @@ body{
 .status-bar.found{color:var(--green);border-color:rgba(30,215,96,0.3)}
 .status-bar.error{color:var(--red);border-color:rgba(232,25,44,0.3)}
 
-/* ── PRODUCT CARD (result) ── */
+/* ── PRODUCT CARD ── */
 .result-card{
   width:100%;max-width:400px;
   background:var(--card2);
@@ -214,10 +215,38 @@ body{
 }
 .rc-divider{height:1px;background:var(--border);margin:10px 0}
 
-.rc-contacts{font-size:0.85rem;color:var(--gray);line-height:2;margin-bottom:12px}
-.rc-contacts a{color:var(--white);text-decoration:none}
+/* ── ACTION BUTTONS ── */
+.rc-actions-title{
+  font-size:0.72rem;color:var(--gray);
+  text-transform:uppercase;letter-spacing:.5px;
+  margin-bottom:8px;
+}
+.rc-actions-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;margin-bottom:10px;
+}
+.act-btn{
+  padding:12px 8px;border-radius:14px;
+  font-family:inherit;font-size:0.82rem;font-weight:700;
+  cursor:pointer;border:none;
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;transition:all .2s;
+  flex-direction:column;gap:4px;
+}
+.act-btn .act-icon{font-size:1.4rem}
+.act-btn .act-label{font-size:0.76rem;font-weight:600}
+.act-btn:active{opacity:.8;transform:scale(.97)}
+.act-sell{background:rgba(30,215,96,0.15);color:var(--green);border:1.5px solid rgba(30,215,96,0.3)}
+.act-sell:hover{background:rgba(30,215,96,0.25)}
+.act-return{background:rgba(74,158,255,0.15);color:var(--blue);border:1.5px solid rgba(74,158,255,0.3)}
+.act-return:hover{background:rgba(74,158,255,0.25)}
+.act-price{background:rgba(245,166,35,0.15);color:var(--yellow);border:1.5px solid rgba(245,166,35,0.3)}
+.act-price:hover{background:rgba(245,166,35,0.25)}
+.act-info{background:rgba(168,85,247,0.15);color:var(--purple);border:1.5px solid rgba(168,85,247,0.3)}
+.act-info:hover{background:rgba(168,85,247,0.25)}
 
-.rc-actions{display:flex;gap:8px}
+.rc-bottom-actions{display:flex;gap:8px;margin-top:4px}
 .rc-btn{
   flex:1;padding:11px 8px;border-radius:12px;
   font-family:inherit;font-size:0.85rem;font-weight:700;
@@ -227,8 +256,90 @@ body{
 }
 .rc-btn:active{opacity:.8;transform:scale(.97)}
 .rc-btn-tg{background:#2481CC;color:white}
-.rc-btn-red{background:var(--red);color:white}
 .rc-btn-scan{background:transparent;border:1.5px solid var(--red);color:var(--red)}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.75);z-index:200;
+  align-items:flex-end;justify-content:center;
+  animation:fadein .2s ease;
+}
+.modal-overlay.show{display:flex}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.modal{
+  width:100%;max-width:460px;
+  background:var(--card);
+  border-radius:24px 24px 0 0;
+  padding:0 0 24px;
+  animation:slideup .3s cubic-bezier(.16,1,.3,1);
+  border-top:1px solid var(--border);
+}
+.modal-handle{
+  width:40px;height:4px;background:rgba(255,255,255,0.15);
+  border-radius:2px;margin:14px auto 0;
+}
+.modal-title{
+  font-size:1rem;font-weight:700;
+  padding:16px 20px 0;
+  display:flex;align-items:center;gap:8px;
+}
+.modal-sub{font-size:0.8rem;color:var(--gray);padding:4px 20px 16px}
+.modal-body{padding:0 20px}
+.modal-label{font-size:0.75rem;color:var(--gray);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.modal-input{
+  width:100%;background:var(--card2);
+  border:1.5px solid var(--border);
+  color:var(--white);font-family:inherit;font-size:1rem;
+  padding:12px 14px;border-radius:12px;outline:none;
+  transition:border-color .2s;margin-bottom:12px;
+}
+.modal-input:focus{border-color:var(--red)}
+.modal-row{display:flex;gap:8px}
+.modal-cancel{
+  flex:1;padding:13px;border-radius:12px;
+  background:rgba(255,255,255,0.06);
+  border:1.5px solid var(--border);
+  color:var(--gray);font-family:inherit;
+  font-size:0.9rem;font-weight:600;cursor:pointer;
+}
+.modal-confirm{
+  flex:2;padding:13px;border-radius:12px;
+  background:var(--red);color:white;
+  border:none;font-family:inherit;
+  font-size:0.9rem;font-weight:700;cursor:pointer;
+  transition:opacity .2s;
+}
+.modal-confirm:active{opacity:.85}
+.modal-confirm.green{background:var(--green);color:#000}
+.modal-confirm.blue{background:var(--blue)}
+.modal-confirm.yellow{background:var(--yellow);color:#000}
+
+/* ── QTY PICKER ── */
+.qty-picker{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.qty-btn{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--card2);border:1.5px solid var(--border);
+  color:var(--white);font-size:1.4rem;font-weight:300;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.qty-btn:active{background:rgba(255,255,255,0.1)}
+.qty-num{
+  flex:1;text-align:center;font-size:1.8rem;font-weight:700;
+  background:var(--card2);border:1.5px solid var(--border);
+  border-radius:12px;padding:8px;color:var(--white);
+  outline:none;
+}
+
+/* ── REASON CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{
+  padding:6px 14px;border-radius:20px;
+  font-size:0.78rem;font-weight:600;
+  background:rgba(255,255,255,0.06);color:var(--gray);
+  border:1.5px solid var(--border);cursor:pointer;transition:all .2s;
+}
+.chip.sel{background:rgba(232,25,44,0.18);color:var(--white);border-color:var(--red)}
 
 /* ── NOT FOUND ── */
 .not-found{
@@ -293,9 +404,15 @@ body{
   cursor:pointer;transition:border-color .2s;
 }
 .hist-item:hover{border-color:rgba(232,25,44,0.3)}
-.hist-code{font-family:monospace;font-size:0.82rem;color:var(--gray);flex:1}
 .hist-name{font-size:0.88rem;font-weight:600}
 .hist-time{font-size:0.72rem;color:var(--gray);margin-top:1px}
+.hist-badge{
+  font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:10px;
+  margin-top:2px;display:inline-block;
+}
+.hb-sold{background:rgba(30,215,96,0.15);color:var(--green)}
+.hb-return{background:rgba(74,158,255,0.15);color:var(--blue)}
+.hb-price{background:rgba(245,166,35,0.15);color:var(--yellow)}
 .hist-del{background:none;border:none;color:var(--gray);cursor:pointer;font-size:1rem;padding:4px}
 .hist-del:hover{color:var(--red)}
 .hist-empty{color:var(--gray);font-size:0.88rem;text-align:center;padding:30px}
@@ -324,7 +441,26 @@ body{
 input:checked+.slider{background:var(--red)}
 input:checked+.slider:before{transform:translateX(20px)}
 
-/* ── ADMIN TAG ── */
+.bot-input-row{
+  display:flex;gap:8px;margin-top:8px;align-items:stretch;
+}
+.bot-input{
+  flex:1;background:var(--card2);
+  border:1.5px solid var(--border);
+  color:var(--white);font-family:monospace;font-size:0.82rem;
+  padding:10px 12px;border-radius:10px;outline:none;
+  transition:border-color .2s;
+}
+.bot-input:focus{border-color:var(--blue)}
+.bot-save-btn{
+  background:var(--blue);color:white;border:none;
+  padding:10px 14px;border-radius:10px;
+  font-family:inherit;font-size:0.82rem;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+}
+.bot-save-btn:active{opacity:.85}
+
+/* ── ADMIN ── */
 .admin-only{
   display:none;
   background:rgba(232,25,44,0.1);border:1px solid rgba(232,25,44,0.2);
@@ -347,6 +483,28 @@ input:checked+.slider:before{transform:translateX(20px)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.err{background:var(--red)}
 .toast.inf{background:var(--blue)}
+.toast.warn{background:var(--yellow);color:#000}
+
+/* ── BOT SYNC BANNER ── */
+.bot-sync-bar{
+  width:100%;max-width:400px;
+  padding:10px 14px;border-radius:12px;
+  background:rgba(74,158,255,0.08);
+  border:1px solid rgba(74,158,255,0.2);
+  display:flex;align-items:center;gap:10px;
+  font-size:0.82rem;
+}
+.bot-sync-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gray);flex-shrink:0;
+}
+.bot-sync-dot.on{background:var(--blue);box-shadow:0 0 6px rgba(74,158,255,0.6)}
+
+/* ── ADMIN BLOCK ── */
+.admin-block{
+  background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.2);
+  border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.82rem;line-height:1.8;color:var(--gray)
+}
 
 .pb{height:24px}
 </style>
@@ -358,10 +516,10 @@ input:checked+.slider:before{transform:translateX(20px)}
     <div class="h-logo">🏪</div>
     <div>
       <div class="h-title">Sariosiyo</div>
-      <div class="h-sub">QR & Barcode Skaner</div>
+      <div class="h-sub">QR & Barcode Skaner Pro</div>
     </div>
   </div>
-  <div class="h-badge" id="serverStatus">⏳ Ulanmoqda</div>
+  <div class="h-badge" id="serverStatus" onclick="checkServer()">⏳ Ulanmoqda</div>
 </div>
 
 <div class="tabs">
@@ -422,7 +580,7 @@ input:checked+.slider:before{transform:translateX(20px)}
 <!-- ══ HISTORY TAB ══ -->
 <div class="pane" id="pane-hist">
   <div class="hist-header">
-    <span style="font-weight:700;font-size:.95rem;">Oxirgi skanlar</span>
+    <span style="font-weight:700;font-size:.95rem;">Oxirgi operatsiyalar</span>
     <button onclick="clearHist()" style="background:none;border:1px solid var(--red);color:var(--red);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.78rem;">Tozalash</button>
   </div>
   <div class="hist-list" id="histList"></div>
@@ -432,13 +590,42 @@ input:checked+.slider:before{transform:translateX(20px)}
 <!-- ══ SETTINGS TAB ══ -->
 <div class="pane" id="pane-sett">
   <div class="sett-wrap">
-    <div class="sett-label" style="margin-top:.5rem">Server</div>
-    <div class="sett-row">
+
+    <div class="sett-label">Bot ulanishi</div>
+    <div class="sett-row" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="sett-title">Telegram Bot Token</div>
+          <div class="sett-sub">Bot bazasidan mahsulot olish uchun</div>
+        </div>
+        <span id="botStatus" style="font-size:.8rem;color:var(--gray)">⏳</span>
+      </div>
+      <div class="bot-input-row">
+        <input type="password" class="bot-input" id="botTokenInput" placeholder="1234567890:AAHxxx...">
+        <button class="bot-save-btn" onclick="saveBot()">💾 Saqlash</button>
+      </div>
+    </div>
+
+    <div class="sett-row" style="flex-direction:column;align-items:stretch;gap:8px">
       <div>
-        <div class="sett-title">Bot Server URL</div>
+        <div class="sett-title">Chat ID</div>
+        <div class="sett-sub">Bot baza xabarlari uchun chat/guruh ID</div>
+      </div>
+      <div class="bot-input-row">
+        <input type="text" class="bot-input" id="chatIdInput" placeholder="-1001234567890">
+        <button class="bot-save-btn" onclick="saveBot()">💾</button>
+      </div>
+    </div>
+
+    <div class="sett-row" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div>
+        <div class="sett-title">API Server URL</div>
         <div class="sett-sub" id="serverUrlDisplay">https://skaner-2.onrender.com</div>
       </div>
-      <span id="sConnStatus" style="font-size:.8rem;color:var(--gray)">⏳</span>
+      <div class="bot-input-row">
+        <input type="text" class="bot-input" id="apiUrlInput" placeholder="https://...">
+        <button class="bot-save-btn" onclick="saveApiUrl()">💾</button>
+      </div>
     </div>
 
     <div class="sett-label" style="margin-top:1rem">Kamera</div>
@@ -477,16 +664,118 @@ input:checked+.slider:before{transform:translateX(20px)}
   <div class="pb"></div>
 </div>
 
+<!-- ══ MODALS ══ -->
+
+<!-- SELL MODAL -->
+<div class="modal-overlay" id="modalSell">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✅ Sotish</div>
+    <div class="modal-sub" id="sellProductName">Mahsulot nomi</div>
+    <div class="modal-body">
+      <div class="modal-label">Miqdori</div>
+      <div class="qty-picker">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <input class="qty-num" id="sellQty" type="number" value="1" min="1">
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <div class="modal-label" style="margin-bottom:6px">Sababi (ixtiyoriy)</div>
+      <div class="chips" id="sellReasonChips">
+        <div class="chip sel" onclick="selChip(this,'sell')">Oddiy sotuv</div>
+        <div class="chip" onclick="selChip(this,'sell')">Naqd pul</div>
+        <div class="chip" onclick="selChip(this,'sell')">Plastik</div>
+        <div class="chip" onclick="selChip(this,'sell')">Transfer</div>
+        <div class="chip" onclick="selChip(this,'sell')">Chegirma</div>
+      </div>
+      <div class="modal-row">
+        <button class="modal-cancel" onclick="closeModal('modalSell')">Bekor</button>
+        <button class="modal-confirm green" onclick="confirmAction('sell')">✅ Tasdiqlash</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RETURN MODAL -->
+<div class="modal-overlay" id="modalReturn">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">↩ Qaytarish</div>
+    <div class="modal-sub" id="returnProductName">Mahsulot nomi</div>
+    <div class="modal-body">
+      <div class="modal-label">Miqdori</div>
+      <div class="qty-picker">
+        <button class="qty-btn" onclick="changeQtyR(-1)">−</button>
+        <input class="qty-num" id="returnQty" type="number" value="1" min="1">
+        <button class="qty-btn" onclick="changeQtyR(1)">+</button>
+      </div>
+      <div class="modal-label" style="margin-bottom:6px">Sababi</div>
+      <div class="chips" id="returnReasonChips">
+        <div class="chip sel" onclick="selChip(this,'return')">Nuqsonli</div>
+        <div class="chip" onclick="selChip(this,'return')">Noto'g'ri o'lcham</div>
+        <div class="chip" onclick="selChip(this,'return')">Mijoz rad etdi</div>
+        <div class="chip" onclick="selChip(this,'return')">Yangi olib kelindi</div>
+      </div>
+      <div class="modal-row">
+        <button class="modal-cancel" onclick="closeModal('modalReturn')">Bekor</button>
+        <button class="modal-confirm blue" onclick="confirmAction('return')">↩ Qaytarish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICE MODAL -->
+<div class="modal-overlay" id="modalPrice">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💰 Narx o'zgartirish</div>
+    <div class="modal-sub" id="priceProductName">Mahsulot nomi</div>
+    <div class="modal-body">
+      <div class="modal-label">Yangi sotuv narxi (so'm)</div>
+      <input class="modal-input" id="newSellPrice" type="number" placeholder="150000">
+      <div class="modal-label">Yangi tannarx (so'm, ixtiyoriy)</div>
+      <input class="modal-input" id="newBuyPrice" type="number" placeholder="100000">
+      <div class="modal-label" style="margin-bottom:6px">Sababi</div>
+      <div class="chips" id="priceReasonChips">
+        <div class="chip sel" onclick="selChip(this,'price')">Bozor narxi o'zgardi</div>
+        <div class="chip" onclick="selChip(this,'price')">Chegirma</div>
+        <div class="chip" onclick="selChip(this,'price')">Aksiya</div>
+        <div class="chip" onclick="selChip(this,'price')">Narx oshdi</div>
+      </div>
+      <div class="modal-row">
+        <button class="modal-cancel" onclick="closeModal('modalPrice')">Bekor</button>
+        <button class="modal-confirm yellow" onclick="confirmAction('price')">💰 Saqlash</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INFO MODAL (bot xabari) -->
+<div class="modal-overlay" id="modalInfo">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📤 Botga yuborish</div>
+    <div class="modal-sub" id="infoProductName">Mahsulot ma'lumoti botga yuboriladi</div>
+    <div class="modal-body">
+      <div class="modal-label">Qo'shimcha izoh (ixtiyoriy)</div>
+      <input class="modal-input" id="infoNote" type="text" placeholder="Masalan: do'konning 2-javonida...">
+      <div class="modal-row">
+        <button class="modal-cancel" onclick="closeModal('modalInfo')">Bekor</button>
+        <button class="modal-confirm" onclick="confirmAction('info')">📤 Yuborish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- jsQR library for QR code scanning -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-
 <script>
 // ══════════════════════════════════════════════════════════
-// CONFIG
+// CONFIG — localStorage dan olinadi
 // ══════════════════════════════════════════════════════════
-const API_URL = 'https://skaner-2.onrender.com';
+let API_URL = localStorage.getItem('apiUrl') || 'https://skaner-2.onrender.com';
+let BOT_TOKEN = localStorage.getItem('botToken') || '';
+let CHAT_ID = localStorage.getItem('chatId') || '';
 const CHANNEL = 'sariosiyo_online';
 const ADMIN_PASSWORDS = ['admin123', 'sariosiyo', '12345678'];
 
@@ -499,6 +788,8 @@ let camStream = null, torchTrack = null;
 let animFrame = null;
 let isAdmin = false;
 let serverOnline = false;
+let currentProduct = null;  // Hozirgi skanlanayotgan mahsulot
+let currentBarcode = '';
 
 const FORMATS = [
   {id:'qr_code', label:'QR', on:true},
@@ -512,6 +803,50 @@ const FORMATS = [
 const $ = id => document.getElementById(id);
 
 // ══════════════════════════════════════════════════════════
+// INIT SETTINGS
+// ══════════════════════════════════════════════════════════
+function initSettings() {
+  $('serverUrlDisplay').textContent = API_URL;
+  $('apiUrlInput').value = API_URL;
+  if (BOT_TOKEN) $('botTokenInput').value = BOT_TOKEN;
+  if (CHAT_ID) $('chatIdInput').value = CHAT_ID;
+  updateBotStatus();
+}
+
+function saveBot() {
+  BOT_TOKEN = $('botTokenInput').value.trim();
+  CHAT_ID = $('chatIdInput').value.trim();
+  localStorage.setItem('botToken', BOT_TOKEN);
+  localStorage.setItem('chatId', CHAT_ID);
+  updateBotStatus();
+  showToast('✅ Bot sozlamalari saqlandi');
+}
+
+function saveApiUrl() {
+  const url = $('apiUrlInput').value.trim();
+  if (!url) return;
+  API_URL = url;
+  localStorage.setItem('apiUrl', url);
+  $('serverUrlDisplay').textContent = url;
+  showToast('✅ URL saqlandi', 'inf');
+  checkServer();
+}
+
+function updateBotStatus() {
+  const el = $('botStatus');
+  if (BOT_TOKEN && CHAT_ID) {
+    el.textContent = '🟢 Ulangan';
+    el.style.color = 'var(--green)';
+  } else if (BOT_TOKEN) {
+    el.textContent = '🟡 Chat ID yo\'q';
+    el.style.color = 'var(--yellow)';
+  } else {
+    el.textContent = '🔴 Token yo\'q';
+    el.style.color = 'var(--red)';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
 // SERVER CHECK
 // ══════════════════════════════════════════════════════════
 async function checkServer() {
@@ -522,38 +857,162 @@ async function checkServer() {
     serverOnline = false;
   }
   const badge = $('serverStatus');
-  const connStatus = $('sConnStatus');
   if (serverOnline) {
     badge.textContent = '🟢 Online';
     badge.style.background = 'rgba(30,215,96,0.2)';
     badge.style.borderColor = 'rgba(30,215,96,0.4)';
-    connStatus.textContent = '🟢 Ulangan';
-    connStatus.style.color = 'var(--green)';
   } else {
     badge.textContent = '🔴 Offline';
     badge.style.background = 'rgba(232,25,44,0.2)';
     badge.style.borderColor = 'rgba(232,25,44,0.4)';
-    connStatus.textContent = '🔴 Ulanmagan';
-    connStatus.style.color = 'var(--red)';
   }
 }
 
 // ══════════════════════════════════════════════════════════
-// API FETCH
+// API FETCH — API serverdan yoki botdan mahsulot olish
 // ══════════════════════════════════════════════════════════
 async function fetchProduct(code) {
+  // 1. Avval API serverdan sinab ko'ramiz
+  if (serverOnline || API_URL) {
+    try {
+      const r = await fetch(`${API_URL}/api/product?barcode=${encodeURIComponent(code.trim().toUpperCase())}`, {
+        signal: AbortSignal.timeout(8000)
+      });
+      if (r.ok) {
+        serverOnline = true;
+        return await r.json();
+      }
+    } catch(e) {
+      serverOnline = false;
+    }
+  }
+
+  // 2. Agar server ishlamasa, botdan so'raymiz (webhook orqali)
+  if (BOT_TOKEN) {
+    return await fetchFromBot(code);
+  }
+
+  return null;
+}
+
+// Bot API orqali mahsulot ma'lumotini qidirish
+async function fetchFromBot(code) {
+  if (!BOT_TOKEN || !CHAT_ID) return null;
   try {
-    const r = await fetch(`${API_URL}/api/product?barcode=${encodeURIComponent(code.trim().toUpperCase())}`, {
-      signal: AbortSignal.timeout(8000)
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    serverOnline = true;
-    return await r.json();
+    // Botga so'rov yuboring — bot webhook orqali javob beradi
+    // Bu yerda biz botga /product komandasi yuboramiz
+    const msg = `/product ${code.trim().toUpperCase()}`;
+    const sendResult = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: msg,
+          parse_mode: 'HTML'
+        }),
+        signal: AbortSignal.timeout(10000)
+      }
+    );
+    if (!sendResult.ok) return null;
+    showToast('📤 Botdan so\'ralmoqda...', 'inf', 3000);
+    return null; // Bot javobini polling orqali kutish kerak (server tomonida)
   } catch(e) {
-    serverOnline = false;
-    console.warn('API xato:', e.message);
     return null;
   }
+}
+
+// ══════════════════════════════════════════════════════════
+// BOT XABAR YUBORISH — Telegram Bot orqali
+// ══════════════════════════════════════════════════════════
+async function sendBotMessage(text) {
+  if (!BOT_TOKEN || !CHAT_ID) {
+    showToast('⚠️ Bot token yoki Chat ID yo\'q!', 'warn');
+    return false;
+  }
+  try {
+    const r = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: text,
+          parse_mode: 'HTML'
+        }),
+        signal: AbortSignal.timeout(8000)
+      }
+    );
+    return r.ok;
+  } catch(e) {
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// API ACTION — Server orqali amallar
+// ══════════════════════════════════════════════════════════
+async function sendAction(action, payload) {
+  // API serverga yuborish
+  if (serverOnline) {
+    try {
+      const r = await fetch(`${API_URL}/api/action`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action, ...payload}),
+        signal: AbortSignal.timeout(8000)
+      });
+      if (r.ok) {
+        const data = await r.json();
+        return {ok: true, source: 'server', data};
+      }
+    } catch(e) {}
+  }
+  // Botga yuborish (fallback yoki qo'shimcha)
+  let msg = '';
+  const p = currentProduct;
+  const ts = new Date().toLocaleString('uz-UZ');
+  const worker = isAdmin ? '👤 Admin' : '👤 Xodim';
+
+  if (action === 'sell') {
+    msg = `🛒 <b>SOTUV</b>\n\n` +
+      `📦 Mahsulot: <b>${p.name}</b>\n` +
+      `🔖 Kod: <code>${currentBarcode}</code>\n` +
+      `💰 Narx: <b>${fmt(p.sell_price)} so'm</b>\n` +
+      `📊 Miqdor: <b>${payload.qty} ${p.unit || 'dona'}</b>\n` +
+      `💵 Jami: <b>${fmt(p.sell_price * payload.qty)} so'm</b>\n` +
+      `📝 Sabab: ${payload.reason}\n` +
+      `${worker}\n⏰ ${ts}`;
+  } else if (action === 'return') {
+    msg = `↩️ <b>QAYTARISH</b>\n\n` +
+      `📦 Mahsulot: <b>${p.name}</b>\n` +
+      `🔖 Kod: <code>${currentBarcode}</code>\n` +
+      `📊 Miqdor: <b>${payload.qty} ${p.unit || 'dona'}</b>\n` +
+      `📝 Sabab: ${payload.reason}\n` +
+      `${worker}\n⏰ ${ts}`;
+  } else if (action === 'price') {
+    msg = `💰 <b>NARX O'ZGARTIRILDI</b>\n\n` +
+      `📦 Mahsulot: <b>${p.name}</b>\n` +
+      `🔖 Kod: <code>${currentBarcode}</code>\n` +
+      `🏷️ Eski narx: <b>${fmt(p.sell_price)} so'm</b>\n` +
+      `✅ Yangi narx: <b>${fmt(payload.sell_price)} so'm</b>\n` +
+      (payload.buy_price ? `📉 Yangi tannarx: <b>${fmt(payload.buy_price)} so'm</b>\n` : '') +
+      `📝 Sabab: ${payload.reason}\n` +
+      `${worker}\n⏰ ${ts}`;
+  } else if (action === 'info') {
+    msg = `ℹ️ <b>MAHSULOT MA'LUMOTI</b>\n\n` +
+      `📦 Mahsulot: <b>${p.name}</b>\n` +
+      `🔖 Kod: <code>${currentBarcode}</code>\n` +
+      `💰 Narx: <b>${fmt(p.sell_price)} so'm</b>\n` +
+      (p.stock !== undefined ? `📦 Stok: <b>${p.stock} ${p.unit || ''}</b>\n` : '') +
+      (payload.note ? `📝 Izoh: ${payload.note}\n` : '') +
+      `${worker}\n⏰ ${ts}`;
+  }
+
+  const botOk = await sendBotMessage(msg);
+  return {ok: botOk, source: 'bot'};
 }
 
 // ══════════════════════════════════════════════════════════
@@ -633,7 +1092,7 @@ async function toggleTorch() {
 }
 
 // ══════════════════════════════════════════════════════════
-// SCAN LOOP — BarcodeDetector + jsQR fallback
+// SCAN LOOP
 // ══════════════════════════════════════════════════════════
 function startScanLoop() {
   const video = $('video');
@@ -653,27 +1112,19 @@ function startScanLoop() {
 
       let code = null;
 
-      // 1. BarcodeDetector API (Chrome Android, Chrome Desktop)
       if (useBarcodeDetector) {
         try {
           const activeFmts = FORMATS.filter(f => f.on).map(f => f.id);
-          if (!detector) {
-            detector = new BarcodeDetector({formats: activeFmts});
-          }
+          if (!detector) detector = new BarcodeDetector({formats: activeFmts});
           const codes = await detector.detect(video);
           if (codes.length > 0) code = codes[0].rawValue;
-        } catch(e) {
-          detector = null;
-        }
+        } catch(e) { detector = null; }
       }
 
-      // 2. jsQR fallback — QR kodlar uchun (iOS Safari, Firefox)
       if (!code && window.jsQR) {
         try {
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const qr = jsQR(imgData.data, imgData.width, imgData.height, {
-            inversionAttempts: 'dontInvert'
-          });
+          const qr = jsQR(imgData.data, imgData.width, imgData.height, {inversionAttempts: 'dontInvert'});
           if (qr) code = qr.data;
         } catch(e) {}
       }
@@ -683,8 +1134,7 @@ function startScanLoop() {
         if (code !== lastCode || now - lastTime > 3000) {
           lastCode = code;
           lastTime = now;
-          beep();
-          vibrate();
+          beep(); vibrate();
           $('camWrap').classList.add('found');
           setTimeout(() => $('camWrap').classList.remove('found'), 600);
           scanning = false;
@@ -697,23 +1147,19 @@ function startScanLoop() {
     if (scanning) animFrame = requestAnimationFrame(loop);
   }
 
-  video.addEventListener('playing', () => {
-    animFrame = requestAnimationFrame(loop);
-  }, {once: false});
+  video.addEventListener('playing', () => { animFrame = requestAnimationFrame(loop); }, {once: false});
   animFrame = requestAnimationFrame(loop);
 }
 
 // ══════════════════════════════════════════════════════════
-// LOOKUP — product qidirish
+// LOOKUP
 // ══════════════════════════════════════════════════════════
 async function lookup(code, cardId, nfId, nfSubId, loaderId) {
   showEl(loaderId, true);
   hideCard(cardId); hideCard(nfId);
   setSt(`⏳ ${code}`, 'scanning');
+  addHist(code, null, null);
 
-  addHist(code);
-
-  // URL dan barcode bo'lsa uni olish (bot /p/SAR-... linkini skanerlaydi)
   let barcode = code;
   try {
     const u = new URL(code);
@@ -732,23 +1178,27 @@ async function lookup(code, cardId, nfId, nfSubId, loaderId) {
   showEl(loaderId, false);
 
   if (data && data.found) {
+    currentProduct = data.product;
+    currentBarcode = barcode;
     renderCard(data.product, barcode, cardId);
     setSt(`✅ Topildi: ${data.product.name}`, 'found');
     showCard(cardId);
+    updateHist(code, data.product.name, null);
   } else if (data && !data.found) {
+    currentProduct = null;
     $(nfSubId).textContent = `Barcode: ${barcode}`;
     showCard(nfId);
     setSt(`❌ Topilmadi: ${barcode}`, 'error');
   } else {
-    // Server offline — URL ni to'g'ridan ochish
+    currentProduct = null;
     $(nfSubId).textContent = `Server bilan aloqa yo'q. Kod: ${barcode}`;
     showCard(nfId);
-    setSt('❌ Server bilan aloqa yo\'q', 'error');
+    setSt('❌ Server yoki bot bilan aloqa yo\'q', 'error');
   }
 }
 
 // ══════════════════════════════════════════════════════════
-// RENDER CARD
+// RENDER CARD — Amallar tugmalari bilan
 // ══════════════════════════════════════════════════════════
 function renderCard(p, rawCode, cardId) {
   let stockCls, stockTxt;
@@ -764,42 +1214,60 @@ function renderCard(p, rawCode, cardId) {
   if (p.color) grid += `<div class="rc-info"><div class="rc-info-label">Rang</div><div class="rc-info-val">${p.color}</div></div>`;
   if (p.size) grid += `<div class="rc-info"><div class="rc-info-label">O'lcham</div><div class="rc-info-val">${p.size}</div></div>`;
   if (p.category) grid += `<div class="rc-info"><div class="rc-info-label">Kategoriya</div><div class="rc-info-val">${p.category}</div></div>`;
-  grid += `<div class="rc-info"><div class="rc-info-label">Birlik</div><div class="rc-info-val">${p.unit}</div></div>`;
+  grid += `<div class="rc-info"><div class="rc-info-label">Birlik</div><div class="rc-info-val">${p.unit || 'dona'}</div></div>`;
 
-  // Admin uchun qo'shimcha ma'lumot
   let adminBlock = '';
   if (isAdmin) {
     const profit = (p.sell_price || 0) - (p.buy_price || 0);
     const pct = p.buy_price > 0 ? ((profit / p.buy_price) * 100).toFixed(0) : 0;
     adminBlock = `
-      <div style="background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.2);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.82rem;line-height:1.8;color:var(--gray)">
+      <div class="admin-block">
         💰 Tannarx: <b style="color:var(--white)">${fmt(p.buy_price)} so'm</b><br>
         📈 Foyda: <b style="color:var(--green)">+${fmt(profit)} so'm (${pct}%)</b><br>
-        📦 Stok: <b style="color:var(--white)">${p.stock} ${p.unit}</b>
+        📦 Stok: <b style="color:var(--white)">${p.stock} ${p.unit || 'dona'}</b>
       </div>`;
   }
 
-  const publicUrl = `${API_URL}/p/${encodeURIComponent(p.barcode || rawCode)}`;
+  // Bot ulanganligini tekshirish
+  const botConnected = BOT_TOKEN && CHAT_ID;
+  const botHint = botConnected ? '' : ' (Bot ulanmagan)';
 
   $(cardId).innerHTML = `
     ${imgHtml}
     <div class="rc-body">
       <div class="rc-badge">${p.category || 'Mahsulot'}</div>
       <div class="rc-name">${p.name}</div>
-      <div class="rc-code">${p.code} · ${p.barcode || rawCode}</div>
+      <div class="rc-code">${p.code || ''} · ${p.barcode || rawCode}</div>
       <div class="rc-price">${fmt(p.sell_price)} <span>so'm</span></div>
       <div class="rc-stock ${stockCls}">${stockTxt}</div>
       ${adminBlock}
       ${grid ? `<div class="rc-grid">${grid}</div>` : ''}
       ${p.description ? `<div class="rc-desc">${p.description}</div>` : ''}
       <div class="rc-divider"></div>
-      <div class="rc-contacts">
-        📱 <a href="tel:+998909182186">+998 90 918 21 86</a><br>
-        📱 <a href="tel:+998947043111">+998 94 704 31 11</a>
+
+      <div class="rc-actions-title">Amallar${botHint}</div>
+      <div class="rc-actions-grid">
+        <button class="act-btn act-sell" onclick="openModal('sell')">
+          <span class="act-icon">✅</span>
+          <span class="act-label">Sotildi</span>
+        </button>
+        <button class="act-btn act-return" onclick="openModal('return')">
+          <span class="act-icon">↩️</span>
+          <span class="act-label">Qaytarildi</span>
+        </button>
+        <button class="act-btn act-price" onclick="openModal('price')">
+          <span class="act-icon">💰</span>
+          <span class="act-label">Narx o'zgartir</span>
+        </button>
+        <button class="act-btn act-info" onclick="openModal('info')">
+          <span class="act-icon">📤</span>
+          <span class="act-label">Botga yuborish</span>
+        </button>
       </div>
-      <div class="rc-actions">
-        <a href="https://t.me/${CHANNEL}" target="_blank" class="rc-btn rc-btn-tg">📲 Telegram</a>
-        <a href="${publicUrl}" target="_blank" class="rc-btn rc-btn-red">🌐 Sahifa</a>
+
+      <div class="rc-divider"></div>
+      <div class="rc-bottom-actions">
+        <a href="https://t.me/${CHANNEL}" target="_blank" class="rc-btn rc-btn-tg">📲 Kanal</a>
         <button onclick="resetScan()" class="rc-btn rc-btn-scan">↩ Qayta</button>
       </div>
     </div>`;
@@ -808,6 +1276,119 @@ function renderCard(p, rawCode, cardId) {
 function fmt(n) {
   if (n == null || n === '') return '—';
   return Math.round(n).toLocaleString('uz-UZ');
+}
+
+// ══════════════════════════════════════════════════════════
+// MODAL MANAGEMENT
+// ══════════════════════════════════════════════════════════
+function openModal(type) {
+  if (!currentProduct) { showToast('Avval mahsulotni skanlang', 'err'); return; }
+  const name = currentProduct.name;
+
+  if (type === 'sell') {
+    $('sellProductName').textContent = `📦 ${name}`;
+    $('sellQty').value = 1;
+    $('modalSell').classList.add('show');
+  } else if (type === 'return') {
+    $('returnProductName').textContent = `📦 ${name}`;
+    $('returnQty').value = 1;
+    $('modalReturn').classList.add('show');
+  } else if (type === 'price') {
+    $('priceProductName').textContent = `📦 ${name}`;
+    $('newSellPrice').value = currentProduct.sell_price || '';
+    $('newBuyPrice').value = currentProduct.buy_price || '';
+    $('modalPrice').classList.add('show');
+  } else if (type === 'info') {
+    $('infoProductName').textContent = `📦 ${name}`;
+    $('infoNote').value = '';
+    $('modalInfo').classList.add('show');
+  }
+}
+
+function closeModal(id) {
+  $(id).classList.remove('show');
+}
+
+// Modal tashqarisiga bosish
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+});
+
+// ── CHIP SELECTION ──
+function selChip(el, group) {
+  const container = el.closest('.chips');
+  container.querySelectorAll('.chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function getSelChip(chipsId) {
+  const sel = $(chipsId).querySelector('.chip.sel');
+  return sel ? sel.textContent : '—';
+}
+
+// ── QTY BUTTONS ──
+function changeQty(d) {
+  const el = $('sellQty');
+  el.value = Math.max(1, parseInt(el.value || 1) + d);
+}
+function changeQtyR(d) {
+  const el = $('returnQty');
+  el.value = Math.max(1, parseInt(el.value || 1) + d);
+}
+
+// ── CONFIRM ACTION ──
+async function confirmAction(type) {
+  let payload = {};
+  let modalId = '';
+  let successMsg = '';
+
+  if (type === 'sell') {
+    const qty = parseInt($('sellQty').value) || 1;
+    const reason = getSelChip('sellReasonChips');
+    payload = {barcode: currentBarcode, qty, reason};
+    modalId = 'modalSell';
+    successMsg = `✅ Sotildi: ${qty} ${currentProduct.unit || 'dona'}`;
+    addHist(currentBarcode, currentProduct.name, 'sold');
+  } else if (type === 'return') {
+    const qty = parseInt($('returnQty').value) || 1;
+    const reason = getSelChip('returnReasonChips');
+    payload = {barcode: currentBarcode, qty, reason};
+    modalId = 'modalReturn';
+    successMsg = `↩️ Qaytarildi: ${qty} ${currentProduct.unit || 'dona'}`;
+    addHist(currentBarcode, currentProduct.name, 'return');
+  } else if (type === 'price') {
+    const sp = parseFloat($('newSellPrice').value);
+    const bp = parseFloat($('newBuyPrice').value);
+    if (!sp) { showToast('Narx kiriting!', 'err'); return; }
+    const reason = getSelChip('priceReasonChips');
+    payload = {barcode: currentBarcode, sell_price: sp, buy_price: bp || undefined, reason};
+    modalId = 'modalPrice';
+    successMsg = `💰 Narx o'zgartirildi: ${fmt(sp)} so'm`;
+    addHist(currentBarcode, currentProduct.name, 'price');
+  } else if (type === 'info') {
+    const note = $('infoNote').value.trim();
+    payload = {barcode: currentBarcode, note};
+    modalId = 'modalInfo';
+    successMsg = `📤 Botga yuborildi`;
+  }
+
+  closeModal(modalId);
+  showToast('⏳ Yuborilmoqda...', 'inf', 2000);
+
+  const result = await sendAction(type, payload);
+
+  if (result && result.ok) {
+    showToast(successMsg);
+    // Mahsulot kartasini yangilash (narx o'zgartirilsa)
+    if (type === 'price' && result.source === 'server') {
+      currentProduct.sell_price = payload.sell_price;
+      if (payload.buy_price) currentProduct.buy_price = payload.buy_price;
+    }
+  } else {
+    showToast('❌ Xato: bot/server bilan aloqa yo\'q', 'err');
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -827,6 +1408,8 @@ $('manualInput').addEventListener('keydown', e => { if (e.key === 'Enter') searc
 function resetScan() {
   scanning = true;
   lastCode = '';
+  currentProduct = null;
+  currentBarcode = '';
   hideCard('resultCard'); hideCard('notFound');
   setSt('🟡 QR yoki barcode ko\'rsating', 'scanning');
   if (animFrame) cancelAnimationFrame(animFrame);
@@ -834,13 +1417,21 @@ function resetScan() {
 }
 
 // ══════════════════════════════════════════════════════════
-// HISTORY
+// HISTORY — amal turi bilan
 // ══════════════════════════════════════════════════════════
-function addHist(code) {
+function addHist(code, name, action) {
   let h = JSON.parse(localStorage.getItem('sarHist') || '[]');
-  h = h.filter(x => x.code !== code);
-  h.unshift({code, time: Date.now()});
-  h = h.slice(0, 40);
+  // Eski yozuvni olib tashlash
+  h = h.filter(x => !(x.code === code && !x.action));
+  h.unshift({code, name: name || code, action, time: Date.now()});
+  h = h.slice(0, 60);
+  localStorage.setItem('sarHist', JSON.stringify(h));
+}
+
+function updateHist(code, name, action) {
+  let h = JSON.parse(localStorage.getItem('sarHist') || '[]');
+  const i = h.findIndex(x => x.code === code);
+  if (i >= 0) { h[i].name = name || code; h[i].action = action; }
   localStorage.setItem('sarHist', JSON.stringify(h));
 }
 
@@ -851,15 +1442,25 @@ function renderHist() {
     list.innerHTML = '<div class="hist-empty">Hali hech narsa skanlanmagan</div>';
     return;
   }
-  list.innerHTML = h.map((item, i) => `
+  const actionLabel = {
+    sold: ['hb-sold', '✅ Sotildi'],
+    return: ['hb-return', '↩️ Qaytarildi'],
+    price: ['hb-price', '💰 Narx o\'zgardi'],
+  };
+  list.innerHTML = h.map((item, i) => {
+    const al = item.action && actionLabel[item.action];
+    const badge = al ? `<div class="hist-badge ${al[0]}">${al[1]}</div>` : '';
+    return `
     <div class="hist-item" onclick="histLookup('${item.code}')">
-      <span style="font-size:1.2rem">📊</span>
+      <span style="font-size:1.2rem">${item.action==='sold'?'✅':item.action==='return'?'↩️':item.action==='price'?'💰':'📊'}</span>
       <div style="flex:1">
-        <div class="hist-name">${item.code}</div>
+        <div class="hist-name">${item.name || item.code}</div>
         <div class="hist-time">${new Date(item.time).toLocaleString('uz-UZ')}</div>
+        ${badge}
       </div>
       <button class="hist-del" onclick="event.stopPropagation();removeHist(${i})">✕</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function histLookup(code) {
@@ -953,7 +1554,7 @@ function vibrate() {
 // ══════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════
-$('serverUrlDisplay').textContent = API_URL;
+initSettings();
 checkServer();
 setInterval(checkServer, 30000);
 startCam().then(startScanLoop);
