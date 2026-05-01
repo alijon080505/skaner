@@ -1,1191 +1,962 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-  <title>Sariosiyo Online — Mahsulot</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Sariosiyo — QR Skaner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-    :root {
-      --red: #E8192C;
-      --red-dark: #C0141F;
-      --red-glow: rgba(232,25,44,0.3);
-      --dark: #0D0D14;
-      --card: #13131E;
-      --card2: #1A1A2E;
-      --border: rgba(255,255,255,0.07);
-      --white: #F4F6FB;
-      --gray: #8892A4;
-      --green: #22C55E;
-      --yellow: #F59E0B;
-      --blue: #3B82F6;
-    }
+:root {
+  --red: #E8192C;
+  --red2: #C0141F;
+  --dark: #0A0A0F;
+  --card: #111118;
+  --card2: #18181F;
+  --border: rgba(255,255,255,0.08);
+  --white: #F0F2F8;
+  --gray: #7A8499;
+  --green: #1ED760;
+  --yellow: #F5A623;
+  --blue: #4A9EFF;
+}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--dark);
+  color:var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
 
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: var(--dark);
-      color: var(--white);
-      min-height: 100vh;
-    }
+/* ── HEADER ── */
+.header{
+  background:var(--red);
+  padding:0 18px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.h-left{display:flex;align-items:center;gap:10px}
+.h-logo{
+  width:36px;height:36px;
+  background:rgba(255,255,255,0.2);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px}
+.h-sub{font-size:0.68rem;opacity:0.85;margin-top:-2px}
+.h-badge{
+  background:rgba(255,255,255,0.2);
+  border:1px solid rgba(255,255,255,0.3);
+  color:white;
+  font-size:0.72rem;font-weight:600;
+  padding:5px 12px;border-radius:20px;
+}
 
-    .header {
-      background: linear-gradient(135deg, var(--red-dark), var(--red));
-      padding: 0 20px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      box-shadow: 0 4px 30px rgba(232,25,44,0.4);
-    }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .logo {
-      width: 40px; height: 40px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .header-title { font-size: 1rem; font-weight: 700; }
-    .header-sub { font-size: 0.72rem; opacity: 0.8; }
-    .admin-btn {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-family: inherit;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .admin-btn:hover { background: rgba(255,255,255,0.25); }
+/* ── TABS ── */
+.tabs{
+  display:flex;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+}
+.tab{
+  flex:1;padding:13px 8px;
+  text-align:center;
+  font-size:0.8rem;font-weight:600;
+  cursor:pointer;color:var(--gray);
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+}
+.tab.active{color:var(--white);border-bottom-color:var(--red)}
 
-    .container { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; }
+/* ── PANES ── */
+.pane{display:none;flex-direction:column;align-items:center;padding:16px;gap:14px}
+.pane.active{display:flex}
 
-    .product-card {
-      background: var(--card);
-      border-radius: 24px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      margin-bottom: 16px;
-    }
+/* ── CAMERA BOX ── */
+.cam-wrap{
+  position:relative;
+  width:100%;max-width:400px;
+  background:#000;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px var(--border), 0 20px 60px rgba(0,0,0,0.6);
+  aspect-ratio:1/1;
+}
+#video{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+#canvas{display:none}
 
-    .img-wrap {
-      position: relative;
-      height: 300px;
-      background: linear-gradient(135deg, #0A0A14, #13131E);
-      overflow: hidden;
-    }
-    .product-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .img-placeholder {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 5rem;
-    }
-    .img-badge {
-      position: absolute;
-      top: 14px; left: 14px;
-      background: var(--red);
-      color: white;
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 20px;
-    }
-    .img-code {
-      position: absolute;
-      bottom: 14px; right: 14px;
-      background: rgba(0,0,0,0.7);
-      color: rgba(255,255,255,0.7);
-      font-size: 0.72rem;
-      font-family: monospace;
-      padding: 4px 10px;
-      border-radius: 8px;
-    }
+/* scan overlay */
+.scan-overlay{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.scan-box{
+  width:65%;height:65%;
+  position:relative;
+}
+.scan-corner{
+  position:absolute;
+  width:22px;height:22px;
+  border-color:var(--red);border-style:solid;
+}
+.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
+.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
+.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+.scan-line{
+  position:absolute;left:5%;right:5%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+  box-shadow:0 0 8px rgba(232,25,44,0.8);
+  animation:scanline 2s ease-in-out infinite;
+}
+@keyframes scanline{0%{top:8%}50%{top:88%}100%{top:8%}}
 
-    .card-body { padding: 22px; }
-    .product-name { font-size: 1.4rem; font-weight: 800; line-height: 1.3; margin-bottom: 6px; }
-    .product-price {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: var(--green);
-      margin: 14px 0;
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .product-price span { font-size: 1rem; color: var(--gray); font-weight: 400; }
-    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+/* found flash */
+.cam-wrap.found{animation:flashgreen .4s ease}
+@keyframes flashgreen{0%,100%{box-shadow:0 0 0 1px var(--border)}50%{box-shadow:0 0 0 3px var(--green), 0 0 30px rgba(30,215,96,0.4)}}
 
-    .params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .param-item {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 14px;
-    }
-    .param-label { font-size: 0.68rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-    .param-value { font-size: 0.95rem; font-weight: 600; }
+/* cam-status */
+.cam-status{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,0.85));
+  padding:20px 14px 12px;
+  font-size:0.8rem;color:rgba(255,255,255,0.8);
+  text-align:center;
+}
 
-    .description {
-      font-size: 0.88rem;
-      color: var(--gray);
-      line-height: 1.7;
-      background: rgba(255,255,255,0.03);
-      border-radius: 12px;
-      padding: 14px;
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
+/* ── FORMAT PILLS ── */
+.fmt-pills{display:flex;flex-wrap:wrap;gap:6px;width:100%;max-width:400px}
+.pill{
+  padding:5px 12px;border-radius:20px;
+  font-size:0.72rem;font-weight:600;
+  background:rgba(255,255,255,0.06);color:var(--gray);
+  border:1px solid var(--border);cursor:pointer;transition:all .2s;
+}
+.pill.on{background:rgba(232,25,44,0.18);color:var(--white);border-color:var(--red)}
 
-    .contact-block {
-      background: linear-gradient(135deg, rgba(232,25,44,0.1), rgba(232,25,44,0.05));
-      border: 1px solid rgba(232,25,44,0.2);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    .contact-title { font-size: 0.78rem; color: var(--red); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
-    .contact-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.9rem; }
-    .contact-row a { color: var(--white); text-decoration: none; }
-    .contact-row a:hover { color: var(--red); }
+/* ── STATUS BAR ── */
+.status-bar{
+  width:100%;max-width:400px;
+  padding:10px 16px;border-radius:12px;
+  font-size:0.85rem;font-weight:500;
+  text-align:center;
+  background:var(--card2);border:1px solid var(--border);
+  transition:all .3s;
+}
+.status-bar.scanning{color:var(--yellow);border-color:rgba(245,166,35,0.3)}
+.status-bar.found{color:var(--green);border-color:rgba(30,215,96,0.3)}
+.status-bar.error{color:var(--red);border-color:rgba(232,25,44,0.3)}
 
-    .btn-group { display: flex; flex-direction: column; gap: 10px; }
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 14px 20px;
-      border-radius: 14px;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-      transition: all 0.2s;
-      width: 100%;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
-      color: white;
-      box-shadow: 0 4px 20px rgba(232,25,44,0.3);
-    }
-    .btn-primary:hover { box-shadow: 0 6px 25px rgba(232,25,44,0.5); transform: translateY(-1px); }
-    .btn-tg {
-      background: linear-gradient(135deg, #2481CC, #1a6ba8);
-      color: white;
-    }
-    .btn-tg:hover { transform: translateY(-1px); }
-    .btn:active { transform: scale(0.98); opacity: 0.9; }
+/* ── PRODUCT CARD (result) ── */
+.result-card{
+  width:100%;max-width:400px;
+  background:var(--card2);
+  border-radius:20px;border:1px solid var(--border);
+  overflow:hidden;
+  display:none;
+  animation:slideup .35s cubic-bezier(.16,1,.3,1);
+}
+.result-card.show{display:block}
+@keyframes slideup{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
-    .stock-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
-    .stock-ok { background: rgba(34,197,94,0.15); color: var(--green); }
-    .stock-low { background: rgba(245,158,11,0.15); color: var(--yellow); }
-    .stock-empty { background: rgba(232,25,44,0.15); color: var(--red); }
+.rc-img{
+  width:100%;height:180px;
+  background:linear-gradient(135deg,#0d0d14,#1a1a2e);
+  object-fit:cover;display:block;
+}
+.rc-img-ph{
+  width:100%;height:180px;
+  background:linear-gradient(135deg,#0d0d14,#1a1a2e);
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+}
+.rc-body{padding:16px}
+.rc-badge{
+  display:inline-block;background:var(--red);color:white;
+  font-size:0.68rem;font-weight:700;
+  padding:3px 10px;border-radius:20px;margin-bottom:8px;
+}
+.rc-name{font-size:1.2rem;font-weight:700;line-height:1.3;margin-bottom:3px}
+.rc-code{font-size:0.75rem;color:var(--gray);font-family:monospace;margin-bottom:12px}
+.rc-price{font-size:1.7rem;font-weight:700;color:var(--green);margin-bottom:10px}
+.rc-price span{font-size:0.85rem;color:var(--gray);font-weight:400}
 
-    /* ═══ ADMIN PANEL ═══ */
-    .admin-panel {
-      display: none;
-      background: var(--card);
-      border-radius: 24px;
-      border: 1px solid rgba(232,25,44,0.3);
-      overflow: hidden;
-      margin-bottom: 16px;
-      animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1);
-    }
-    .admin-panel.show { display: block; }
-    .admin-header {
-      background: linear-gradient(135deg, rgba(232,25,44,0.2), rgba(232,25,44,0.05));
-      border-bottom: 1px solid rgba(232,25,44,0.2);
-      padding: 16px 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .admin-title { font-size: 0.9rem; font-weight: 700; color: var(--red); display: flex; align-items: center; gap: 8px; }
-    .admin-badge { background: var(--red); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
-    .admin-body { padding: 20px 22px; }
-    .admin-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .stat-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
-    .stat-label { font-size: 0.68rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
-    .stat-value { font-size: 1.1rem; font-weight: 700; }
-    .stat-value.green { color: var(--green); }
-    .stat-value.red { color: var(--red); }
-    .stat-value.yellow { color: var(--yellow); }
-    .stat-value.blue { color: var(--blue); }
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.rc-info{background:rgba(255,255,255,0.04);border-radius:10px;padding:9px 11px}
+.rc-info-label{font-size:0.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.rc-info-val{font-size:0.88rem;font-weight:600}
 
-    .profit-bar-wrap { margin: 16px 0; }
-    .profit-bar-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--gray); margin-bottom: 6px; }
-    .profit-bar-bg { height: 8px; background: rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; }
-    .profit-bar-fill { height: 100%; background: linear-gradient(90deg, var(--green), #16a34a); border-radius: 10px; transition: width 1s ease; }
+.rc-stock{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:20px;
+  font-size:0.8rem;font-weight:600;margin-bottom:12px;
+}
+.s-ok{background:rgba(30,215,96,.15);color:var(--green)}
+.s-low{background:rgba(245,166,35,.15);color:var(--yellow)}
+.s-empty{background:rgba(232,25,44,.15);color:var(--red)}
 
-    .admin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
-    .admin-action-btn {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      color: var(--white);
-      font-family: inherit;
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 10px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .admin-action-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
-    .admin-action-btn.danger { color: var(--red); border-color: rgba(232,25,44,0.3); }
-    .admin-action-btn.danger:hover { background: rgba(232,25,44,0.1); }
+.rc-desc{
+  font-size:0.82rem;color:var(--gray);line-height:1.6;
+  padding:10px;background:rgba(255,255,255,0.03);
+  border-radius:8px;margin-bottom:12px;
+}
+.rc-divider{height:1px;background:var(--border);margin:10px 0}
 
-    /* ═══ MODAL ═══ */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 200;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal {
-      background: var(--card2);
-      border-radius: 28px 28px 0 0;
-      width: 100%;
-      max-width: 480px;
-      padding: 10px 24px 40px;
-      border-top: 1px solid var(--border);
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
-    }
-    .modal-overlay.open .modal { transform: translateY(0); }
-    .modal-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 4px; margin: 10px auto 20px; }
-    .modal-title { font-size: 1.2rem; font-weight: 800; text-align: center; margin-bottom: 6px; }
-    .modal-sub { font-size: 0.85rem; color: var(--gray); text-align: center; margin-bottom: 24px; }
+.rc-contacts{font-size:0.85rem;color:var(--gray);line-height:2;margin-bottom:12px}
+.rc-contacts a{color:var(--white);text-decoration:none}
 
-    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .role-card {
-      background: rgba(255,255,255,0.04);
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      padding: 20px 14px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-    .role-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
-    .role-card.selected { border-color: var(--red); background: rgba(232,25,44,0.1); }
-    .role-icon { font-size: 2.5rem; margin-bottom: 10px; }
-    .role-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
-    .role-desc { font-size: 0.72rem; color: var(--gray); }
+.rc-actions{display:flex;gap:8px}
+.rc-btn{
+  flex:1;padding:11px 8px;border-radius:12px;
+  font-family:inherit;font-size:0.85rem;font-weight:700;
+  cursor:pointer;border:none;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  text-decoration:none;transition:all .2s;
+}
+.rc-btn:active{opacity:.8;transform:scale(.97)}
+.rc-btn-tg{background:#2481CC;color:white}
+.rc-btn-red{background:var(--red);color:white}
+.rc-btn-scan{background:transparent;border:1.5px solid var(--red);color:var(--red)}
 
-    .pass-step { display: none; }
-    .pass-step.show { display: block; }
-    .pass-input-wrap { position: relative; margin-bottom: 14px; }
-    .pass-input {
-      width: 100%;
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid var(--border);
-      color: var(--white);
-      font-family: inherit;
-      font-size: 1.1rem;
-      font-weight: 600;
-      padding: 14px 50px 14px 18px;
-      border-radius: 14px;
-      outline: none;
-      letter-spacing: 3px;
-      transition: border-color 0.2s;
-      text-align: center;
-    }
-    .pass-input:focus { border-color: var(--red); }
-    .pass-input.error { border-color: var(--red); animation: shake 0.4s ease; }
-    .pass-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--gray); cursor: pointer; font-size: 1.1rem; padding: 4px; }
-    .pass-hint { font-size: 0.8rem; color: var(--gray); text-align: center; margin-bottom: 16px; }
-    .pass-error { font-size: 0.82rem; color: var(--red); text-align: center; margin-bottom: 10px; display: none; }
-    .pass-error.show { display: block; }
+/* ── NOT FOUND ── */
+.not-found{
+  width:100%;max-width:400px;
+  background:var(--card2);border-radius:20px;
+  border:1px solid rgba(232,25,44,0.2);
+  padding:32px 20px;text-align:center;
+  display:none;
+}
+.not-found.show{display:block;animation:slideup .3s ease}
+.nf-icon{font-size:3rem;margin-bottom:10px}
+.nf-title{font-size:1rem;font-weight:700;color:var(--red);margin-bottom:4px}
+.nf-sub{font-size:0.82rem;color:var(--gray);margin-bottom:16px}
 
-    .modal-btn { width: 100%; padding: 15px; border-radius: 14px; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; margin-bottom: 10px; }
-    .modal-btn-primary { background: linear-gradient(135deg, var(--red), var(--red-dark)); color: white; }
-    .modal-btn-secondary { background: rgba(255,255,255,0.05); color: var(--gray); border: 1px solid var(--border); }
-    .modal-btn-secondary:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+/* ── LOADER ── */
+.loader{
+  width:100%;max-width:400px;
+  display:none;align-items:center;justify-content:center;
+  gap:12px;padding:24px;
+  background:var(--card2);border-radius:20px;border:1px solid var(--border);
+}
+.loader.show{display:flex}
+.spin{
+  width:28px;height:28px;
+  border:2.5px solid rgba(255,255,255,0.1);
+  border-top-color:var(--red);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-txt{font-size:0.88rem;color:var(--gray)}
 
-    /* ═══ SOTISH MODAL ═══ */
-    .action-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 300;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .action-modal-overlay.open { opacity: 1; pointer-events: all; }
-    .action-modal {
-      background: var(--card2);
-      border-radius: 28px 28px 0 0;
-      width: 100%;
-      max-width: 480px;
-      padding: 10px 24px 40px;
-      border-top: 1px solid var(--border);
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-    .action-modal-overlay.open .action-modal { transform: translateY(0); }
+/* ── MANUAL TAB ── */
+.manual-row{width:100%;max-width:400px;display:flex;gap:8px}
+.manual-input{
+  flex:1;background:var(--card2);
+  border:1.5px solid var(--border);
+  color:var(--white);font-family:inherit;font-size:0.95rem;
+  padding:12px 14px;border-radius:12px;outline:none;
+  transition:border-color .2s;
+}
+.manual-input:focus{border-color:var(--red)}
+.manual-btn{
+  background:var(--red);color:white;border:none;
+  padding:12px 18px;border-radius:12px;
+  font-family:inherit;font-size:0.95rem;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+}
+.manual-btn:active{opacity:.85}
 
-    .input-group { margin-bottom: 14px; }
-    .input-label { font-size: 0.78rem; color: var(--gray); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-input {
-      width: 100%;
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid var(--border);
-      color: var(--white);
-      font-family: inherit;
-      font-size: 0.95rem;
-      padding: 12px 16px;
-      border-radius: 12px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .form-input:focus { border-color: var(--red); }
-    .form-input option { background: #1A1A2E; color: var(--white); }
+/* ── HISTORY TAB ── */
+.hist-header{
+  width:100%;max-width:400px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.hist-list{width:100%;max-width:400px}
+.hist-item{
+  background:var(--card2);border-radius:12px;
+  padding:12px 14px;margin-bottom:8px;
+  border:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;transition:border-color .2s;
+}
+.hist-item:hover{border-color:rgba(232,25,44,0.3)}
+.hist-code{font-family:monospace;font-size:0.82rem;color:var(--gray);flex:1}
+.hist-name{font-size:0.88rem;font-weight:600}
+.hist-time{font-size:0.72rem;color:var(--gray);margin-top:1px}
+.hist-del{background:none;border:none;color:var(--gray);cursor:pointer;font-size:1rem;padding:4px}
+.hist-del:hover{color:var(--red)}
+.hist-empty{color:var(--gray);font-size:0.88rem;text-align:center;padding:30px}
 
-    .result-box {
-      background: rgba(34,197,94,0.1);
-      border: 1px solid rgba(34,197,94,0.2);
-      border-radius: 12px;
-      padding: 14px;
-      margin: 14px 0;
-      font-size: 0.9rem;
-      line-height: 1.8;
-    }
-    .result-box.warning {
-      background: rgba(245,158,11,0.1);
-      border-color: rgba(245,158,11,0.2);
-    }
-    .result-box .r-label { font-size: 0.72rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
-    .result-box .r-val { font-size: 1.1rem; font-weight: 700; color: var(--green); }
-    .result-box .r-val.yellow { color: var(--yellow); }
+/* ── SETTINGS TAB ── */
+.sett-wrap{width:100%;max-width:400px}
+.sett-label{font-size:0.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:2px}
+.sett-row{
+  background:var(--card2);border-radius:12px;padding:14px;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;
+  border:1px solid var(--border);
+}
+.sett-title{font-size:0.9rem;font-weight:600}
+.sett-sub{font-size:0.74rem;color:var(--gray);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.slider{
+  position:absolute;cursor:pointer;inset:0;
+  background:rgba(255,255,255,0.15);border-radius:24px;transition:.3s;
+}
+.slider:before{
+  content:"";position:absolute;
+  height:18px;width:18px;left:3px;bottom:3px;
+  background:white;border-radius:50%;transition:.3s;
+}
+input:checked+.slider{background:var(--red)}
+input:checked+.slider:before{transform:translateX(20px)}
 
-    /* Tarix */
-    .history-list { margin-top: 10px; }
-    .history-item {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .history-item-left { font-size: 0.85rem; }
-    .history-item-date { font-size: 0.72rem; color: var(--gray); margin-top: 2px; }
-    .history-item-amount { font-weight: 700; }
-    .history-item-amount.green { color: var(--green); }
-    .history-item-amount.red { color: var(--red); }
+/* ── ADMIN TAG ── */
+.admin-only{
+  display:none;
+  background:rgba(232,25,44,0.1);border:1px solid rgba(232,25,44,0.2);
+  border-radius:10px;padding:10px 14px;margin-top:8px;
+  font-size:0.8rem;color:var(--red);
+}
+.admin-only.show{display:block}
 
-    /* Mahsulot tahrirlash */
-    .edit-section-title {
-      font-size: 0.78rem;
-      color: var(--red);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin: 16px 0 10px;
-    }
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:#22C55E;color:white;
+  padding:10px 20px;border-radius:20px;
+  font-size:0.88rem;font-weight:600;z-index:999;
+  transition:transform .3s cubic-bezier(.16,1,.3,1);
+  white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red)}
+.toast.inf{background:var(--blue)}
 
-    /* QR */
-    .qr-section {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
-    .qr-section h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 14px; color: var(--gray); }
-    .qr-img { width: 160px; height: 160px; background: white; border-radius: 14px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .qr-code-text { font-family: monospace; font-size: 0.85rem; color: var(--gray); background: rgba(255,255,255,0.04); padding: 6px 14px; border-radius: 8px; display: inline-block; }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #22C55E;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      z-index: 999;
-      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-      white-space: nowrap;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.error { background: var(--red); }
-    .toast.info { background: var(--blue); }
-
-    /* Confirm dialog */
-    .confirm-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 400;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .confirm-overlay.open { opacity: 1; pointer-events: all; }
-    .confirm-box {
-      background: var(--card2);
-      border-radius: 24px;
-      padding: 28px 24px;
-      width: 100%;
-      max-width: 340px;
-      border: 1px solid var(--border);
-      text-align: center;
-      transform: scale(0.9);
-      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
-    }
-    .confirm-overlay.open .confirm-box { transform: scale(1); }
-    .confirm-icon { font-size: 3rem; margin-bottom: 14px; }
-    .confirm-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
-    .confirm-msg { font-size: 0.85rem; color: var(--gray); margin-bottom: 22px; line-height: 1.6; }
-    .confirm-btns { display: flex; gap: 10px; }
-    .confirm-btn { flex: 1; padding: 13px; border-radius: 12px; font-family: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; border: none; }
-    .confirm-btn-cancel { background: rgba(255,255,255,0.07); color: var(--gray); border: 1px solid var(--border); }
-    .confirm-btn-ok { background: linear-gradient(135deg, var(--red), var(--red-dark)); color: white; }
-
-    footer { text-align: center; padding: 16px; color: rgba(255,255,255,0.2); font-size: 0.76rem; }
-
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
-  </style>
+.pb{height:24px}
+</style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-left">
-    <div class="logo">🏪</div>
+  <div class="h-left">
+    <div class="h-logo">🏪</div>
     <div>
-      <div class="header-title">Sariosiyo Online</div>
-      <div class="header-sub">Rasmiy do'kon</div>
+      <div class="h-title">Sariosiyo</div>
+      <div class="h-sub">QR & Barcode Skaner</div>
     </div>
   </div>
-  <button class="admin-btn" onclick="openModal()">🔐 Admin</button>
+  <div class="h-badge" id="serverStatus">⏳ Ulanmoqda</div>
 </div>
 
-<div class="container">
-
-  <!-- ADMIN PANEL -->
-  <div class="admin-panel" id="adminPanel">
-    <div class="admin-header">
-      <div class="admin-title">
-        🔐 Admin Panel
-        <span class="admin-badge">MAXFIY</span>
-      </div>
-      <button onclick="logoutAdmin()" style="background:none;border:none;color:var(--gray);cursor:pointer;font-size:0.82rem;">Chiqish ✕</button>
-    </div>
-    <div class="admin-body">
-      <div class="admin-stats">
-        <div class="stat-card">
-          <div class="stat-label">Sotib olish narxi</div>
-          <div class="stat-value red" id="sBuyPrice">85,000 so'm</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Sotish narxi</div>
-          <div class="stat-value green" id="sSellPrice">135,000 so'm</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Sof foyda</div>
-          <div class="stat-value yellow" id="sProfit">+50,000 so'm</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Stok (qoldi)</div>
-          <div class="stat-value blue" id="sStock">24 dona</div>
-        </div>
-      </div>
-
-      <div class="profit-bar-wrap">
-        <div class="profit-bar-label">
-          <span>Foyda foizi</span>
-          <span style="color:var(--green);font-weight:700;" id="sProfitPct">58.8%</span>
-        </div>
-        <div class="profit-bar-bg">
-          <div class="profit-bar-fill" id="profitBar" style="width:0%"></div>
-        </div>
-      </div>
-
-      <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:0.83rem;color:var(--gray);line-height:1.9;">
-        📦 Omborda: <b style="color:var(--white)" id="sStockInfo">24 dona</b><br>
-        📅 Oxirgi kirim: <b style="color:var(--white)" id="sLastIn">2025-05-20</b><br>
-        🏆 Bu oy sotilgan: <b style="color:var(--green)" id="sMonthlySold">47 dona</b><br>
-        💰 Bu oy daromad: <b style="color:var(--green)" id="sMonthlyRevenue">6,345,000 so'm</b>
-      </div>
-
-      <div class="admin-actions">
-        <button class="admin-action-btn" onclick="openSotish()">📤 Sotish</button>
-        <button class="admin-action-btn" onclick="openKirim()">📥 Kirim</button>
-        <button class="admin-action-btn" onclick="openTahrir()">✏️ Tahrirlash</button>
-        <button class="admin-action-btn" onclick="openBot()">🤖 Bot</button>
-        <button class="admin-action-btn danger" onclick="openTarix()">📊 Tarix</button>
-        <button class="admin-action-btn danger" onclick="chiqarishConfirm()">🗑 Chiqarish</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PRODUCT CARD -->
-  <div class="product-card">
-    <div class="img-wrap">
-      <div class="img-placeholder">👕</div>
-      <div class="img-badge" id="prodCategory">KIYIM</div>
-      <div class="img-code" id="prodCode">SAR-482910</div>
-    </div>
-    <div class="card-body">
-      <div class="product-name" id="prodName">Erkaklar sport kurtka — Premium</div>
-      <div style="font-size:0.82rem;color:var(--gray);margin-bottom:10px;">
-        <span style="font-family:monospace;" id="prodCode2">SAR-482910</span>
-      </div>
-
-      <div class="stock-badge stock-ok" id="stockBadge">🟢 Mavjud</div>
-
-      <div class="product-price">
-        <span id="prodPriceDisplay">135,000</span> <span>so'm</span>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="params-grid">
-        <div class="param-item">
-          <div class="param-label">🎨 Rang</div>
-          <div class="param-value" id="prodColor">Qora</div>
-        </div>
-        <div class="param-item">
-          <div class="param-label">📐 O'lcham</div>
-          <div class="param-value" id="prodSize">XL</div>
-        </div>
-        <div class="param-item">
-          <div class="param-label">🗂 Kategoriya</div>
-          <div class="param-value" id="prodCat2">Kiyim</div>
-        </div>
-        <div class="param-item">
-          <div class="param-label">📦 Birlik</div>
-          <div class="param-value" id="prodUnit">dona</div>
-        </div>
-      </div>
-
-      <div class="description" id="prodDesc">
-        Premium sifatli sport kurtka. Sovuq ob-havo uchun ideal.
-        Ichki qismi yumshoq material bilan qoplangan.
-        Mashg'ulot va kundalik kiyish uchun mos.
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="contact-block">
-        <div class="contact-title">📞 Bog'lanish</div>
-        <div class="contact-row">📱 <a href="tel:+998909182186">+998 90 918 21 86</a></div>
-        <div class="contact-row">📱 <a href="tel:+998947043111">+998 94 704 31 11</a></div>
-      </div>
-
-      <div class="btn-group">
-        <a href="https://t.me/sariosiyo_online" target="_blank" class="btn btn-tg">
-          📲 Telegram kanalga o'tish
-        </a>
-        <a href="https://t.me/sariosiyo_online" target="_blank" class="btn btn-primary">
-          🛍 Buyurtma berish
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- QR -->
-  <div class="qr-section">
-    <h3>📱 Mahsulot QR Kodi</h3>
-    <div class="qr-img" id="qrContainer">
-      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="200" height="200" fill="white"/>
-        <g fill="#1a1a2e">
-          <rect x="10" y="10" width="60" height="60" rx="4"/><rect x="18" y="18" width="44" height="44" rx="2" fill="white"/><rect x="26" y="26" width="28" height="28" rx="1"/>
-          <rect x="130" y="10" width="60" height="60" rx="4"/><rect x="138" y="18" width="44" height="44" rx="2" fill="white"/><rect x="146" y="26" width="28" height="28" rx="1"/>
-          <rect x="10" y="130" width="60" height="60" rx="4"/><rect x="18" y="138" width="44" height="44" rx="2" fill="white"/><rect x="26" y="146" width="28" height="28" rx="1"/>
-          <rect x="80" y="10" width="8" height="8"/><rect x="96" y="10" width="8" height="8"/><rect x="112" y="10" width="8" height="8"/>
-          <rect x="80" y="26" width="8" height="8"/><rect x="104" y="26" width="8" height="8"/>
-          <rect x="80" y="42" width="8" height="8"/><rect x="96" y="42" width="8" height="8"/>
-          <rect x="80" y="58" width="8" height="8"/><rect x="112" y="58" width="8" height="8"/>
-          <rect x="10" y="80" width="8" height="8"/><rect x="26" y="80" width="8" height="8"/><rect x="42" y="80" width="8" height="8"/><rect x="58" y="80" width="8" height="8"/>
-          <rect x="80" y="80" width="8" height="8"/><rect x="96" y="80" width="8" height="8"/><rect x="120" y="80" width="8" height="8"/><rect x="144" y="80" width="8" height="8"/><rect x="160" y="80" width="8" height="8"/><rect x="184" y="80" width="8" height="8"/>
-          <rect x="10" y="96" width="8" height="8"/><rect x="42" y="96" width="8" height="8"/><rect x="80" y="96" width="8" height="8"/><rect x="104" y="96" width="8" height="8"/><rect x="128" y="96" width="8" height="8"/><rect x="152" y="96" width="8" height="8"/><rect x="176" y="96" width="8" height="8"/>
-          <rect x="10" y="112" width="8" height="8"/><rect x="26" y="112" width="8" height="8"/><rect x="58" y="112" width="8" height="8"/><rect x="88" y="112" width="8" height="8"/><rect x="112" y="112" width="8" height="8"/><rect x="136" y="112" width="8" height="8"/><rect x="168" y="112" width="8" height="8"/><rect x="184" y="112" width="8" height="8"/>
-          <rect x="80" y="128" width="8" height="8"/><rect x="104" y="128" width="8" height="8"/><rect x="128" y="128" width="8" height="8"/><rect x="152" y="128" width="8" height="8"/><rect x="176" y="128" width="8" height="8"/>
-          <rect x="80" y="144" width="8" height="8"/><rect x="96" y="144" width="8" height="8"/><rect x="120" y="144" width="8" height="8"/><rect x="144" y="144" width="8" height="8"/><rect x="168" y="144" width="8" height="8"/>
-          <rect x="80" y="160" width="8" height="8"/><rect x="112" y="160" width="8" height="8"/><rect x="128" y="160" width="8" height="8"/><rect x="160" y="160" width="8" height="8"/><rect x="184" y="160" width="8" height="8"/>
-          <rect x="80" y="176" width="8" height="8"/><rect x="96" y="176" width="8" height="8"/><rect x="136" y="176" width="8" height="8"/><rect x="152" y="176" width="8" height="8"/><rect x="176" y="176" width="8" height="8"/>
-        </g>
-        <circle cx="100" cy="100" r="10" fill="#E8192C"/><circle cx="100" cy="100" r="6" fill="white"/><circle cx="100" cy="100" r="3" fill="#E8192C"/>
-      </svg>
-    </div>
-    <div class="qr-code-text" id="qrCode">SAR-482910</div>
-  </div>
-
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('scan')">📷 Skanerlash</div>
+  <div class="tab" onclick="switchTab('manual')">⌨️ Qo'lda</div>
+  <div class="tab" onclick="switchTab('hist')">🕘 Tarix</div>
+  <div class="tab" onclick="switchTab('sett')">⚙️ Sozlama</div>
 </div>
 
-<footer>© 2025 Sariosiyo Online · Barcha huquqlar himoyalangan</footer>
-
-<!-- ═══ ADMIN LOGIN MODAL ═══ -->
-<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
-  <div class="modal" id="modal">
-    <div class="modal-handle"></div>
-    <div id="step1">
-      <div class="modal-title">Siz kimsiz?</div>
-      <div class="modal-sub">Mahsulot haqida to'liq ma'lumot olish uchun tanlang</div>
-      <div class="role-grid">
-        <div class="role-card" id="roleCustomer" onclick="selectRole('customer')">
-          <div class="role-icon">🛍</div>
-          <div class="role-name">Mijoz</div>
-          <div class="role-desc">Narx va mahsulot ma'lumotlari</div>
-        </div>
-        <div class="role-card" id="roleAdmin" onclick="selectRole('admin')">
-          <div class="role-icon">🔐</div>
-          <div class="role-name">Admin / Xodim</div>
-          <div class="role-desc">To'liq ma'lumot + stok</div>
-        </div>
+<!-- ══ SCAN TAB ══ -->
+<div class="pane active" id="pane-scan">
+  <div class="cam-wrap" id="camWrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <div class="scan-overlay">
+      <div class="scan-box">
+        <div class="scan-line"></div>
+        <div class="scan-corner tl"></div>
+        <div class="scan-corner tr"></div>
+        <div class="scan-corner bl"></div>
+        <div class="scan-corner br"></div>
       </div>
-      <button class="modal-btn modal-btn-primary" onclick="confirmRole()" id="confirmBtn" style="opacity:0.4;pointer-events:none;">Davom etish →</button>
-      <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Bekor qilish</button>
     </div>
-    <div id="step2" class="pass-step">
-      <div class="modal-title">🔐 Admin parol</div>
-      <div class="modal-sub">Maxfiy parolni kiriting</div>
-      <div class="pass-input-wrap">
-        <input type="password" class="pass-input" id="passInput" placeholder="● ● ● ● ● ●" maxlength="20" onkeydown="if(event.key==='Enter')checkPass()">
-        <button class="pass-toggle" onclick="togglePass()">👁</button>
-      </div>
-      <div class="pass-error" id="passError">❌ Noto'g'ri parol!</div>
-      <div class="pass-hint">Demo parollar: <b>admin123</b> yoki <b>sariosiyo</b></div>
-      <button class="modal-btn modal-btn-primary" onclick="checkPass()">✅ Kirish</button>
-      <button class="modal-btn modal-btn-secondary" onclick="backToStep1()">← Orqaga</button>
-    </div>
-    <div id="step3" class="pass-step">
-      <div style="text-align:center;padding:10px 0 20px;">
-        <div style="font-size:3rem;margin-bottom:12px;">✅</div>
-        <div class="modal-title" style="color:var(--green)">Xush kelibsiz!</div>
-        <div class="modal-sub">Admin ma'lumotlari yuklandi</div>
-      </div>
-      <button class="modal-btn modal-btn-primary" onclick="closeModal()">Ko'rish →</button>
-    </div>
+    <div class="cam-status" id="camStatus">📷 Kamera yuklanmoqda...</div>
   </div>
+
+  <div class="fmt-pills" id="fmtPills"></div>
+  <div class="status-bar" id="statusBar">Kamera ochilishini kuting...</div>
+  <div class="loader" id="loader"><div class="spin"></div><span class="loader-txt">Qidirilmoqda...</span></div>
+  <div class="result-card" id="resultCard"></div>
+  <div class="not-found" id="notFound">
+    <div class="nf-icon">🔍</div>
+    <div class="nf-title">Mahsulot topilmadi</div>
+    <div class="nf-sub" id="nfSub">Barcode bazada yo'q</div>
+    <button onclick="resetScan()" class="rc-btn rc-btn-scan" style="max-width:160px;margin:0 auto;">↩ Qayta skanerlash</button>
+  </div>
+  <div class="pb"></div>
 </div>
 
-<!-- ═══ ACTION MODAL (Sotish / Kirim / Tahrirlash / Tarix / Bot) ═══ -->
-<div class="action-modal-overlay" id="actionModalOverlay" onclick="handleActionOverlayClick(event)">
-  <div class="action-modal" id="actionModal">
-    <div class="modal-handle"></div>
-    <div id="actionModalContent"></div>
+<!-- ══ MANUAL TAB ══ -->
+<div class="pane" id="pane-manual">
+  <div class="manual-row">
+    <input class="manual-input" id="manualInput" type="text"
+      placeholder="SAR-123456 yoki mahsulot nomi..."
+      autocomplete="off" autocorrect="off" autocapitalize="characters">
+    <button class="manual-btn" onclick="searchManual()">🔍</button>
   </div>
+  <div class="loader" id="loader2"><div class="spin"></div><span class="loader-txt">Qidirilmoqda...</span></div>
+  <div class="result-card" id="resultCard2"></div>
+  <div class="not-found" id="notFound2">
+    <div class="nf-icon">🔍</div>
+    <div class="nf-title">Topilmadi</div>
+    <div class="nf-sub" id="nfSub2"></div>
+  </div>
+  <div class="pb"></div>
 </div>
 
-<!-- ═══ CONFIRM DIALOG ═══ -->
-<div class="confirm-overlay" id="confirmOverlay">
-  <div class="confirm-box">
-    <div class="confirm-icon" id="confirmIcon">🗑</div>
-    <div class="confirm-title" id="confirmTitle">Tasdiqlang</div>
-    <div class="confirm-msg" id="confirmMsg">Haqiqatan ham bajarmoqchimisiz?</div>
-    <div class="confirm-btns">
-      <button class="confirm-btn confirm-btn-cancel" onclick="closeConfirm()">Bekor</button>
-      <button class="confirm-btn confirm-btn-ok" id="confirmOkBtn">Ha, tasdiqlash</button>
+<!-- ══ HISTORY TAB ══ -->
+<div class="pane" id="pane-hist">
+  <div class="hist-header">
+    <span style="font-weight:700;font-size:.95rem;">Oxirgi skanlar</span>
+    <button onclick="clearHist()" style="background:none;border:1px solid var(--red);color:var(--red);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.78rem;">Tozalash</button>
+  </div>
+  <div class="hist-list" id="histList"></div>
+  <div class="pb"></div>
+</div>
+
+<!-- ══ SETTINGS TAB ══ -->
+<div class="pane" id="pane-sett">
+  <div class="sett-wrap">
+    <div class="sett-label" style="margin-top:.5rem">Server</div>
+    <div class="sett-row">
+      <div>
+        <div class="sett-title">Bot Server URL</div>
+        <div class="sett-sub" id="serverUrlDisplay">https://skaner-2.onrender.com</div>
+      </div>
+      <span id="sConnStatus" style="font-size:.8rem;color:var(--gray)">⏳</span>
+    </div>
+
+    <div class="sett-label" style="margin-top:1rem">Kamera</div>
+    <div class="sett-row">
+      <div><div class="sett-title">Orqa kamera</div><div class="sett-sub">Barcode uchun qulay</div></div>
+      <label class="toggle"><input type="checkbox" id="backCam" checked onchange="restartCam()"><span class="slider"></span></label>
+    </div>
+    <div class="sett-row">
+      <div><div class="sett-title">Torch (chiroq)</div><div class="sett-sub">Qorong'i joyda</div></div>
+      <label class="toggle"><input type="checkbox" id="torchOn" onchange="toggleTorch()"><span class="slider"></span></label>
+    </div>
+
+    <div class="sett-label" style="margin-top:1rem">Ovoz & tebranish</div>
+    <div class="sett-row">
+      <div><div class="sett-title">Beep ovozi</div><div class="sett-sub">Topilganda signal</div></div>
+      <label class="toggle"><input type="checkbox" id="soundOn" checked><span class="slider"></span></label>
+    </div>
+    <div class="sett-row">
+      <div><div class="sett-title">Tebranish</div><div class="sett-sub">Topilganda vibro</div></div>
+      <label class="toggle"><input type="checkbox" id="vibrOn" checked><span class="slider"></span></label>
+    </div>
+
+    <div class="sett-label" style="margin-top:1rem">Admin</div>
+    <div class="sett-row">
+      <div><div class="sett-title">Admin rejimi</div><div class="sett-sub" id="adminModeLabel">Stok va narxlarni ko'rish</div></div>
+      <label class="toggle"><input type="checkbox" id="adminMode" onchange="toggleAdmin()"><span class="slider"></span></label>
+    </div>
+    <div class="admin-only" id="adminPassWrap">
+      <div style="font-size:.78rem;margin-bottom:6px">Admin paroli:</div>
+      <div style="display:flex;gap:6px">
+        <input type="password" id="adminPassInput" placeholder="Parol kiriting..." class="manual-input" style="font-size:.85rem;padding:8px 12px">
+        <button onclick="checkAdminPass()" class="manual-btn" style="padding:8px 14px;font-size:.85rem">✓</button>
+      </div>
     </div>
   </div>
+  <div class="pb"></div>
 </div>
 
-<!-- ═══ TOAST ═══ -->
 <div class="toast" id="toast"></div>
 
+<!-- jsQR library for QR code scanning -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
 <script>
-  // ══════════════════════════════════════
-  // STATE
-  // ══════════════════════════════════════
-  const state = {
-    buyPrice: 85000,
-    sellPrice: 135000,
-    stock: 24,
-    monthlySold: 47,
-    monthlyRevenue: 6345000,
-    lastIn: '2025-05-20',
-    name: 'Erkaklar sport kurtka — Premium',
-    code: 'SAR-482910',
-    category: 'Kiyim',
-    color: 'Qora',
-    size: 'XL',
-    unit: 'dona',
-    desc: "Premium sifatli sport kurtka. Sovuq ob-havo uchun ideal. Ichki qismi yumshoq material bilan qoplangan. Mashg'ulot va kundalik kiyish uchun mos.",
-    history: [
-      { type: 'sell', qty: 3, price: 135000, total: 405000, date: '2025-05-20 14:32', note: 'Naqd pul' },
-      { type: 'sell', qty: 1, price: 135000, total: 135000, date: '2025-05-19 10:15', note: 'Telegram buyurtma' },
-      { type: 'in', qty: 10, price: 85000, total: 850000, date: '2025-05-18 09:00', note: 'Ombor kirim' },
-      { type: 'sell', qty: 2, price: 130000, total: 260000, date: '2025-05-17 16:45', note: 'Chegirmali' },
-      { type: 'in', qty: 20, price: 82000, total: 1640000, date: '2025-05-10 11:00', note: 'Ombor kirim' },
-    ]
-  };
+// ══════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════
+const API_URL = 'https://skaner-2.onrender.com';
+const CHANNEL = 'sariosiyo_online';
+const ADMIN_PASSWORDS = ['admin123', 'sariosiyo', '12345678'];
 
-  const ADMIN_PASSWORDS = ['admin123', 'sariosiyo', '12345678'];
-  let isAdmin = false;
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let scanning = true;
+let lastCode = '', lastTime = 0;
+let camStream = null, torchTrack = null;
+let animFrame = null;
+let isAdmin = false;
+let serverOnline = false;
 
-  // ══════════════════════════════════════
-  // TOAST
-  // ══════════════════════════════════════
-  function showToast(msg, type = 'success', duration = 2500) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show' + (type !== 'success' ? ' ' + type : '');
-    setTimeout(() => t.classList.remove('show'), duration);
-  }
+const FORMATS = [
+  {id:'qr_code', label:'QR', on:true},
+  {id:'code_128', label:'CODE 128', on:true},
+  {id:'code_39', label:'CODE 39', on:true},
+  {id:'ean_13', label:'EAN-13', on:true},
+  {id:'ean_8', label:'EAN-8', on:false},
+  {id:'upc_a', label:'UPC-A', on:false},
+];
 
-  // ══════════════════════════════════════
-  // ADMIN LOGIN MODAL
-  // ══════════════════════════════════════
-  function openModal() {
-    document.getElementById('modalOverlay').classList.add('open');
-    resetModal();
+const $ = id => document.getElementById(id);
+
+// ══════════════════════════════════════════════════════════
+// SERVER CHECK
+// ══════════════════════════════════════════════════════════
+async function checkServer() {
+  try {
+    const r = await fetch(`${API_URL}/health`, {signal: AbortSignal.timeout(5000)});
+    serverOnline = r.ok;
+  } catch(e) {
+    serverOnline = false;
   }
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('open');
+  const badge = $('serverStatus');
+  const connStatus = $('sConnStatus');
+  if (serverOnline) {
+    badge.textContent = '🟢 Online';
+    badge.style.background = 'rgba(30,215,96,0.2)';
+    badge.style.borderColor = 'rgba(30,215,96,0.4)';
+    connStatus.textContent = '🟢 Ulangan';
+    connStatus.style.color = 'var(--green)';
+  } else {
+    badge.textContent = '🔴 Offline';
+    badge.style.background = 'rgba(232,25,44,0.2)';
+    badge.style.borderColor = 'rgba(232,25,44,0.4)';
+    connStatus.textContent = '🔴 Ulanmagan';
+    connStatus.style.color = 'var(--red)';
   }
-  function handleOverlayClick(e) {
-    if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+// ══════════════════════════════════════════════════════════
+// API FETCH
+// ══════════════════════════════════════════════════════════
+async function fetchProduct(code) {
+  try {
+    const r = await fetch(`${API_URL}/api/product?barcode=${encodeURIComponent(code.trim().toUpperCase())}`, {
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    serverOnline = true;
+    return await r.json();
+  } catch(e) {
+    serverOnline = false;
+    console.warn('API xato:', e.message);
+    return null;
   }
-  function resetModal() {
-    let sel = null;
-    document.getElementById('step1').style.display = 'block';
-    document.getElementById('step2').classList.remove('show');
-    document.getElementById('step3').classList.remove('show');
-    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-    document.getElementById('confirmBtn').style.opacity = '0.4';
-    document.getElementById('confirmBtn').style.pointerEvents = 'none';
-    document.getElementById('passInput').value = '';
-    document.getElementById('passError').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════
+// FORMAT PILLS
+// ══════════════════════════════════════════════════════════
+function buildPills() {
+  const wrap = $('fmtPills');
+  wrap.innerHTML = '';
+  FORMATS.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'pill' + (f.on ? ' on' : '');
+    d.textContent = f.label;
+    d.onclick = () => { f.on = !f.on; d.classList.toggle('on', f.on); };
+    wrap.appendChild(d);
+  });
+}
+buildPills();
+
+// ══════════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['scan','manual','hist','sett'][i] === name);
+  });
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  $('pane-'+name).classList.add('active');
+  if (name === 'hist') renderHist();
+  if (name === 'scan') { scanning = true; }
+  else { scanning = false; }
+}
+
+// ══════════════════════════════════════════════════════════
+// CAMERA
+// ══════════════════════════════════════════════════════════
+async function startCam() {
+  const back = $('backCam').checked;
+  try {
+    if (camStream) camStream.getTracks().forEach(t => t.stop());
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: back ? 'environment' : 'user',
+        width: {ideal: 1280},
+        height: {ideal: 720}
+      }
+    });
+    const vid = $('video');
+    vid.srcObject = camStream;
+    torchTrack = camStream.getVideoTracks()[0];
+    vid.onloadedmetadata = () => {
+      vid.play();
+      $('camStatus').textContent = '';
+      setSt('🟡 QR yoki barcode ko\'rsating', 'scanning');
+    };
+  } catch(e) {
+    $('camWrap').style.display = 'none';
+    setSt('⌨️ Kamera yo\'q — qo\'lda kiriting', 'error');
+    $('camStatus').textContent = '📷 Kamera ruxsat berilmagan';
   }
-  function selectRole(role) {
-    document.getElementById('roleCustomer').classList.toggle('selected', role === 'customer');
-    document.getElementById('roleAdmin').classList.toggle('selected', role === 'admin');
-    document.getElementById('confirmBtn').style.opacity = '1';
-    document.getElementById('confirmBtn').style.pointerEvents = 'all';
-    document.getElementById('confirmBtn').dataset.role = role;
+}
+
+async function restartCam() {
+  scanning = true;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  await startCam();
+  startScanLoop();
+}
+
+async function toggleTorch() {
+  if (!torchTrack) return;
+  try {
+    await torchTrack.applyConstraints({advanced: [{torch: $('torchOn').checked}]});
+  } catch(e) {
+    $('torchOn').checked = false;
+    showToast('Torch qo\'llab-quvvatlanmaydi', 'err');
   }
-  function confirmRole() {
-    const role = document.getElementById('confirmBtn').dataset.role;
-    if (!role) return;
-    if (role === 'customer') {
-      closeModal();
-      showToast('✅ Mijoz sifatida kirildi');
-    } else {
-      document.getElementById('step1').style.display = 'none';
-      document.getElementById('step2').classList.add('show');
-      setTimeout(() => document.getElementById('passInput').focus(), 300);
+}
+
+// ══════════════════════════════════════════════════════════
+// SCAN LOOP — BarcodeDetector + jsQR fallback
+// ══════════════════════════════════════════════════════════
+function startScanLoop() {
+  const video = $('video');
+  const canvas = $('canvas');
+  const ctx = canvas.getContext('2d', {willReadFrequently: true});
+
+  let detector = null;
+  const useBarcodeDetector = 'BarcodeDetector' in window;
+
+  async function loop() {
+    if (!scanning) return;
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      let code = null;
+
+      // 1. BarcodeDetector API (Chrome Android, Chrome Desktop)
+      if (useBarcodeDetector) {
+        try {
+          const activeFmts = FORMATS.filter(f => f.on).map(f => f.id);
+          if (!detector) {
+            detector = new BarcodeDetector({formats: activeFmts});
+          }
+          const codes = await detector.detect(video);
+          if (codes.length > 0) code = codes[0].rawValue;
+        } catch(e) {
+          detector = null;
+        }
+      }
+
+      // 2. jsQR fallback — QR kodlar uchun (iOS Safari, Firefox)
+      if (!code && window.jsQR) {
+        try {
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const qr = jsQR(imgData.data, imgData.width, imgData.height, {
+            inversionAttempts: 'dontInvert'
+          });
+          if (qr) code = qr.data;
+        } catch(e) {}
+      }
+
+      if (code) {
+        const now = Date.now();
+        if (code !== lastCode || now - lastTime > 3000) {
+          lastCode = code;
+          lastTime = now;
+          beep();
+          vibrate();
+          $('camWrap').classList.add('found');
+          setTimeout(() => $('camWrap').classList.remove('found'), 600);
+          scanning = false;
+          await lookup(code, 'resultCard', 'notFound', 'nfSub', 'loader');
+          return;
+        }
+      }
     }
+
+    if (scanning) animFrame = requestAnimationFrame(loop);
   }
-  function checkPass() {
-    const pass = document.getElementById('passInput').value.trim();
-    const input = document.getElementById('passInput');
-    const errEl = document.getElementById('passError');
-    if (ADMIN_PASSWORDS.includes(pass)) {
-      input.classList.remove('error');
-      errEl.classList.remove('show');
-      document.getElementById('step2').classList.remove('show');
-      document.getElementById('step3').classList.add('show');
-      isAdmin = true;
-      showAdminPanel();
-      setTimeout(() => closeModal(), 1400);
-    } else {
-      input.classList.add('error');
-      errEl.classList.add('show');
-      input.value = '';
-      setTimeout(() => input.classList.remove('error'), 500);
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+  video.addEventListener('playing', () => {
+    animFrame = requestAnimationFrame(loop);
+  }, {once: false});
+  animFrame = requestAnimationFrame(loop);
+}
+
+// ══════════════════════════════════════════════════════════
+// LOOKUP — product qidirish
+// ══════════════════════════════════════════════════════════
+async function lookup(code, cardId, nfId, nfSubId, loaderId) {
+  showEl(loaderId, true);
+  hideCard(cardId); hideCard(nfId);
+  setSt(`⏳ ${code}`, 'scanning');
+
+  addHist(code);
+
+  // URL dan barcode bo'lsa uni olish (bot /p/SAR-... linkini skanerlaydi)
+  let barcode = code;
+  try {
+    const u = new URL(code);
+    const parts = u.pathname.split('/').filter(Boolean);
+    if (parts[0] === 'p' && parts[1]) barcode = parts[1];
+    else if (u.searchParams.get('barcode')) barcode = u.searchParams.get('barcode');
+    else if (u.searchParams.get('start') && u.searchParams.get('start').startsWith('qr_'))
+      barcode = u.searchParams.get('start').replace('qr_', '');
+    else if (u.hostname === 't.me') {
+      const sp = u.searchParams.get('start') || '';
+      if (sp.startsWith('qr_')) barcode = sp.replace('qr_', '');
     }
+  } catch(e) {}
+
+  const data = await fetchProduct(barcode);
+  showEl(loaderId, false);
+
+  if (data && data.found) {
+    renderCard(data.product, barcode, cardId);
+    setSt(`✅ Topildi: ${data.product.name}`, 'found');
+    showCard(cardId);
+  } else if (data && !data.found) {
+    $(nfSubId).textContent = `Barcode: ${barcode}`;
+    showCard(nfId);
+    setSt(`❌ Topilmadi: ${barcode}`, 'error');
+  } else {
+    // Server offline — URL ni to'g'ridan ochish
+    $(nfSubId).textContent = `Server bilan aloqa yo'q. Kod: ${barcode}`;
+    showCard(nfId);
+    setSt('❌ Server bilan aloqa yo\'q', 'error');
   }
-  function backToStep1() {
-    document.getElementById('step2').classList.remove('show');
-    document.getElementById('step1').style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER CARD
+// ══════════════════════════════════════════════════════════
+function renderCard(p, rawCode, cardId) {
+  let stockCls, stockTxt;
+  if (p.stock === 0) { stockCls='s-empty'; stockTxt='🔴 Tugagan'; }
+  else if (p.stock <= (p.min_stock || 5)) { stockCls='s-low'; stockTxt=`🟡 Kam: ${p.stock} ${p.unit}`; }
+  else { stockCls='s-ok'; stockTxt=`🟢 Mavjud: ${p.stock} ${p.unit}`; }
+
+  const imgHtml = p.photo_url
+    ? `<img class="rc-img" src="${p.photo_url}" onerror="this.outerHTML='<div class=rc-img-ph>📦</div>'">`
+    : `<div class="rc-img-ph">📦</div>`;
+
+  let grid = '';
+  if (p.color) grid += `<div class="rc-info"><div class="rc-info-label">Rang</div><div class="rc-info-val">${p.color}</div></div>`;
+  if (p.size) grid += `<div class="rc-info"><div class="rc-info-label">O'lcham</div><div class="rc-info-val">${p.size}</div></div>`;
+  if (p.category) grid += `<div class="rc-info"><div class="rc-info-label">Kategoriya</div><div class="rc-info-val">${p.category}</div></div>`;
+  grid += `<div class="rc-info"><div class="rc-info-label">Birlik</div><div class="rc-info-val">${p.unit}</div></div>`;
+
+  // Admin uchun qo'shimcha ma'lumot
+  let adminBlock = '';
+  if (isAdmin) {
+    const profit = (p.sell_price || 0) - (p.buy_price || 0);
+    const pct = p.buy_price > 0 ? ((profit / p.buy_price) * 100).toFixed(0) : 0;
+    adminBlock = `
+      <div style="background:rgba(232,25,44,0.08);border:1px solid rgba(232,25,44,0.2);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.82rem;line-height:1.8;color:var(--gray)">
+        💰 Tannarx: <b style="color:var(--white)">${fmt(p.buy_price)} so'm</b><br>
+        📈 Foyda: <b style="color:var(--green)">+${fmt(profit)} so'm (${pct}%)</b><br>
+        📦 Stok: <b style="color:var(--white)">${p.stock} ${p.unit}</b>
+      </div>`;
   }
-  function togglePass() {
-    const inp = document.getElementById('passInput');
-    inp.type = inp.type === 'password' ? 'text' : 'password';
+
+  const publicUrl = `${API_URL}/p/${encodeURIComponent(p.barcode || rawCode)}`;
+
+  $(cardId).innerHTML = `
+    ${imgHtml}
+    <div class="rc-body">
+      <div class="rc-badge">${p.category || 'Mahsulot'}</div>
+      <div class="rc-name">${p.name}</div>
+      <div class="rc-code">${p.code} · ${p.barcode || rawCode}</div>
+      <div class="rc-price">${fmt(p.sell_price)} <span>so'm</span></div>
+      <div class="rc-stock ${stockCls}">${stockTxt}</div>
+      ${adminBlock}
+      ${grid ? `<div class="rc-grid">${grid}</div>` : ''}
+      ${p.description ? `<div class="rc-desc">${p.description}</div>` : ''}
+      <div class="rc-divider"></div>
+      <div class="rc-contacts">
+        📱 <a href="tel:+998909182186">+998 90 918 21 86</a><br>
+        📱 <a href="tel:+998947043111">+998 94 704 31 11</a>
+      </div>
+      <div class="rc-actions">
+        <a href="https://t.me/${CHANNEL}" target="_blank" class="rc-btn rc-btn-tg">📲 Telegram</a>
+        <a href="${publicUrl}" target="_blank" class="rc-btn rc-btn-red">🌐 Sahifa</a>
+        <button onclick="resetScan()" class="rc-btn rc-btn-scan">↩ Qayta</button>
+      </div>
+    </div>`;
+}
+
+function fmt(n) {
+  if (n == null || n === '') return '—';
+  return Math.round(n).toLocaleString('uz-UZ');
+}
+
+// ══════════════════════════════════════════════════════════
+// MANUAL SEARCH
+// ══════════════════════════════════════════════════════════
+async function searchManual() {
+  const code = $('manualInput').value.trim();
+  if (!code) { $('manualInput').focus(); return; }
+  beep();
+  await lookup(code, 'resultCard2', 'notFound2', 'nfSub2', 'loader2');
+}
+$('manualInput').addEventListener('keydown', e => { if (e.key === 'Enter') searchManual(); });
+
+// ══════════════════════════════════════════════════════════
+// RESET
+// ══════════════════════════════════════════════════════════
+function resetScan() {
+  scanning = true;
+  lastCode = '';
+  hideCard('resultCard'); hideCard('notFound');
+  setSt('🟡 QR yoki barcode ko\'rsating', 'scanning');
+  if (animFrame) cancelAnimationFrame(animFrame);
+  startScanLoop();
+}
+
+// ══════════════════════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════════════════════
+function addHist(code) {
+  let h = JSON.parse(localStorage.getItem('sarHist') || '[]');
+  h = h.filter(x => x.code !== code);
+  h.unshift({code, time: Date.now()});
+  h = h.slice(0, 40);
+  localStorage.setItem('sarHist', JSON.stringify(h));
+}
+
+function renderHist() {
+  const list = $('histList');
+  const h = JSON.parse(localStorage.getItem('sarHist') || '[]');
+  if (!h.length) {
+    list.innerHTML = '<div class="hist-empty">Hali hech narsa skanlanmagan</div>';
+    return;
   }
-  function showAdminPanel() {
-    document.getElementById('adminPanel').classList.add('show');
-    updateAdminStats();
-    setTimeout(() => {
-      const pct = ((state.sellPrice - state.buyPrice) / state.buyPrice * 100).toFixed(1);
-      document.getElementById('profitBar').style.width = pct + '%';
-    }, 300);
-  }
-  function logoutAdmin() {
+  list.innerHTML = h.map((item, i) => `
+    <div class="hist-item" onclick="histLookup('${item.code}')">
+      <span style="font-size:1.2rem">📊</span>
+      <div style="flex:1">
+        <div class="hist-name">${item.code}</div>
+        <div class="hist-time">${new Date(item.time).toLocaleString('uz-UZ')}</div>
+      </div>
+      <button class="hist-del" onclick="event.stopPropagation();removeHist(${i})">✕</button>
+    </div>`).join('');
+}
+
+async function histLookup(code) {
+  switchTab('scan');
+  await lookup(code, 'resultCard', 'notFound', 'nfSub', 'loader');
+}
+
+function removeHist(i) {
+  let h = JSON.parse(localStorage.getItem('sarHist') || '[]');
+  h.splice(i, 1);
+  localStorage.setItem('sarHist', JSON.stringify(h));
+  renderHist();
+}
+
+function clearHist() {
+  localStorage.removeItem('sarHist');
+  renderHist();
+  showToast('Tarix tozalandi', 'inf');
+}
+
+// ══════════════════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════════════════
+function toggleAdmin() {
+  const on = $('adminMode').checked;
+  if (on) {
+    $('adminPassWrap').classList.add('show');
+    $('adminModeLabel').textContent = 'Parol kiriting';
+    $('adminPassInput').focus();
+  } else {
     isAdmin = false;
-    document.getElementById('adminPanel').classList.remove('show');
-    showToast('Admin paneldan chiqildi', 'info');
+    $('adminPassWrap').classList.remove('show');
+    $('adminModeLabel').textContent = 'Stok va narxlarni ko\'rish';
+    showToast('Admin rejimdan chiqildi', 'inf');
   }
+}
 
-  // ══════════════════════════════════════
-  // UPDATE STATS
-  // ══════════════════════════════════════
-  function updateAdminStats() {
-    const profit = state.sellPrice - state.buyPrice;
-    const pct = (profit / state.buyPrice * 100).toFixed(1);
-    document.getElementById('sBuyPrice').textContent = fmt(state.buyPrice) + " so'm";
-    document.getElementById('sSellPrice').textContent = fmt(state.sellPrice) + " so'm";
-    document.getElementById('sProfit').textContent = '+' + fmt(profit) + " so'm";
-    document.getElementById('sStock').textContent = state.stock + ' dona';
-    document.getElementById('sProfitPct').textContent = pct + '%';
-    document.getElementById('sStockInfo').textContent = state.stock + ' dona';
-    document.getElementById('sLastIn').textContent = state.lastIn;
-    document.getElementById('sMonthlySold').textContent = state.monthlySold + ' dona';
-    document.getElementById('sMonthlyRevenue').textContent = fmt(state.monthlyRevenue) + " so'm";
-    document.getElementById('profitBar').style.width = pct + '%';
+function checkAdminPass() {
+  const pass = $('adminPassInput').value.trim();
+  if (ADMIN_PASSWORDS.includes(pass)) {
+    isAdmin = true;
+    $('adminPassWrap').classList.remove('show');
+    $('adminModeLabel').textContent = '✅ Admin rejim faol';
+    showToast('✅ Admin rejim yoqildi');
+  } else {
+    $('adminPassInput').value = '';
+    $('adminPassInput').style.borderColor = 'var(--red)';
+    setTimeout(() => $('adminPassInput').style.borderColor = '', 1000);
+    showToast('❌ Noto\'g\'ri parol', 'err');
+    $('adminMode').checked = false;
+    toggleAdmin();
+  }
+}
 
-    // Update product card
-    document.getElementById('prodPriceDisplay').textContent = fmt(state.sellPrice);
-    document.getElementById('prodName').textContent = state.name;
-    document.getElementById('prodCode').textContent = state.code;
-    document.getElementById('prodCode2').textContent = state.code;
-    document.getElementById('qrCode').textContent = state.code;
-    document.getElementById('prodColor').textContent = state.color;
-    document.getElementById('prodSize').textContent = state.size;
-    document.getElementById('prodCat2').textContent = state.category;
-    document.getElementById('prodUnit').textContent = state.unit;
-    document.getElementById('prodDesc').textContent = state.desc;
-    document.getElementById('prodCategory').textContent = state.category.toUpperCase();
+// ══════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════
+function setSt(txt, cls) {
+  const el = $('statusBar');
+  if (el) { el.textContent = txt; el.className = 'status-bar ' + (cls || ''); }
+}
+function showEl(id, v) { const el=$(id); if(el) el.classList.toggle('show', v); }
+function showCard(id) { const el=$(id); if(el) el.classList.add('show'); }
+function hideCard(id) { const el=$(id); if(el) el.classList.remove('show'); }
 
-    const sb = document.getElementById('stockBadge');
-    if (state.stock === 0) {
-      sb.className = 'stock-badge stock-empty';
-      sb.textContent = '🔴 Tugagan';
-    } else if (state.stock <= 5) {
-      sb.className = 'stock-badge stock-low';
-      sb.textContent = '🟡 Kam qoldi (' + state.stock + ')';
-    } else {
-      sb.className = 'stock-badge stock-ok';
-      sb.textContent = '🟢 Mavjud (' + state.stock + ')';
-    }
-  }
-  function fmt(n) {
-    return n.toLocaleString('uz-UZ');
-  }
+function showToast(msg, type='', dur=2500) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
 
-  // ══════════════════════════════════════
-  // ACTION MODAL
-  // ══════════════════════════════════════
-  function openActionModal(html) {
-    document.getElementById('actionModalContent').innerHTML = html;
-    document.getElementById('actionModalOverlay').classList.add('open');
-  }
-  function closeActionModal() {
-    document.getElementById('actionModalOverlay').classList.remove('open');
-  }
-  function handleActionOverlayClick(e) {
-    if (e.target === document.getElementById('actionModalOverlay')) closeActionModal();
-  }
+function beep() {
+  if (!$('soundOn').checked) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'square'; o.frequency.value = 900;
+    g.gain.setValueAtTime(0.25, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.1);
+  } catch(e) {}
+}
 
-  // ── SOTISH ────────────────────────────
-  function openSotish() {
-    openActionModal(`
-    <div class="modal-title">📤 Sotish</div>
-    <div class="modal-sub">Mahsulotni sotish</div>
-    <div class="input-group">
-      <label class="input-label">Miqdor (dona)</label>
-      <input type="number" class="form-input" id="sQty" value="1" min="1" max="${state.stock}" oninput="calcSotish()">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Narx (so'm)</label>
-      <input type="number" class="form-input" id="sPrice" value="${state.sellPrice}" oninput="calcSotish()">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Izoh</label>
-      <input type="text" class="form-input" id="sNote" placeholder="Naqd / Telegram / Boshqa">
-    </div>
-    <div class="result-box" id="sotishResult">
-      <div class="r-label">Jami summa</div>
-      <div class="r-val" id="sotishTotal">${fmt(state.sellPrice)} so'm</div>
-      <div class="r-label" style="margin-top:8px;">Foyda</div>
-      <div class="r-val" id="sotishFoyda">+${fmt(state.sellPrice - state.buyPrice)} so'm</div>
-    </div>
-    <div style="font-size:0.82rem;color:var(--gray);margin-bottom:14px;">Omborda: <b style="color:var(--white)">${state.stock} dona</b></div>
-    <button class="modal-btn modal-btn-primary" onclick="doSotish()">✅ Sotishni tasdiqlash</button>
-    <button class="modal-btn modal-btn-secondary" onclick="closeActionModal()">Bekor qilish</button>
-  `);
-  }
-  function calcSotish() {
-    const qty = parseInt(document.getElementById('sQty').value) || 1;
-    const price = parseInt(document.getElementById('sPrice').value) || state.sellPrice;
-    const total = qty * price;
-    const foyda = qty * (price - state.buyPrice);
-    document.getElementById('sotishTotal').textContent = fmt(total) + " so'm";
-    document.getElementById('sotishFoyda').textContent = (foyda >= 0 ? '+' : '') + fmt(foyda) + " so'm";
-    document.getElementById('sotishFoyda').style.color = foyda >= 0 ? 'var(--green)' : 'var(--red)';
-  }
-  function doSotish() {
-    const qty = parseInt(document.getElementById('sQty').value) || 1;
-    const price = parseInt(document.getElementById('sPrice').value) || state.sellPrice;
-    const note = document.getElementById('sNote').value || 'Naqd';
-    if (qty > state.stock) { showToast('❌ Stokda yetarli mahsulot yo\'q!', 'error'); return; }
-    if (qty <= 0) { showToast('❌ Miqdor 0 dan katta bo\'lishi kerak!', 'error'); return; }
-    const total = qty * price;
-    state.stock -= qty;
-    state.monthlySold += qty;
-    state.monthlyRevenue += total;
-    state.history.unshift({ type: 'sell', qty, price, total, date: new Date().toLocaleString('uz-UZ'), note });
-    updateAdminStats();
-    closeActionModal();
-    showToast(`✅ ${qty} dona sotildi! +${fmt(total)} so'm`);
-  }
+function vibrate() {
+  if ($('vibrOn').checked && navigator.vibrate) navigator.vibrate(80);
+}
 
-  // ── KIRIM ────────────────────────────
-  function openKirim() {
-    openActionModal(`
-    <div class="modal-title">📥 Kirim</div>
-    <div class="modal-sub">Ombor kirim</div>
-    <div class="input-group">
-      <label class="input-label">Miqdor (dona)</label>
-      <input type="number" class="form-input" id="kQty" value="10" min="1" oninput="calcKirim()">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Tannarx (so'm)</label>
-      <input type="number" class="form-input" id="kBuyPrice" value="${state.buyPrice}" oninput="calcKirim()">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Izoh</label>
-      <input type="text" class="form-input" id="kNote" placeholder="Yetkazib beruvchi nomi">
-    </div>
-    <div class="result-box warning" id="kirimResult">
-      <div class="r-label">Jami xarajat</div>
-      <div class="r-val yellow" id="kirimTotal">${fmt(state.buyPrice * 10)} so'm</div>
-      <div class="r-label" style="margin-top:8px;">Yangi stok</div>
-      <div class="r-val yellow" id="kirimNewStock">${state.stock + 10} dona</div>
-    </div>
-    <button class="modal-btn modal-btn-primary" onclick="doKirim()">✅ Kirimni tasdiqlash</button>
-    <button class="modal-btn modal-btn-secondary" onclick="closeActionModal()">Bekor qilish</button>
-  `);
-  }
-  function calcKirim() {
-    const qty = parseInt(document.getElementById('kQty').value) || 0;
-    const bp = parseInt(document.getElementById('kBuyPrice').value) || state.buyPrice;
-    document.getElementById('kirimTotal').textContent = fmt(qty * bp) + " so'm";
-    document.getElementById('kirimNewStock').textContent = (state.stock + qty) + ' dona';
-  }
-  function doKirim() {
-    const qty = parseInt(document.getElementById('kQty').value) || 0;
-    const bp = parseInt(document.getElementById('kBuyPrice').value) || state.buyPrice;
-    const note = document.getElementById('kNote').value || 'Ombor kirim';
-    if (qty <= 0) { showToast('❌ Miqdor 0 dan katta bo\'lishi kerak!', 'error'); return; }
-    const total = qty * bp;
-    state.stock += qty;
-    state.buyPrice = bp;
-    state.lastIn = new Date().toISOString().slice(0, 10);
-    state.history.unshift({ type: 'in', qty, price: bp, total, date: new Date().toLocaleString('uz-UZ'), note });
-    updateAdminStats();
-    closeActionModal();
-    showToast(`✅ ${qty} dona kirim qilindi!`);
-  }
-
-  // ── TAHRIRLASH ────────────────────────
-  function openTahrir() {
-    openActionModal(`
-    <div class="modal-title">✏️ Mahsulotni tahrirlash</div>
-    <div class="modal-sub">Ma'lumotlarni o'zgartiring</div>
-    <div class="edit-section-title">Asosiy</div>
-    <div class="input-group">
-      <label class="input-label">Mahsulot nomi</label>
-      <input type="text" class="form-input" id="eName" value="${state.name}">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Kod</label>
-      <input type="text" class="form-input" id="eCode" value="${state.code}">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Kategoriya</label>
-      <select class="form-input" id="eCat">
-        <option value="Kiyim" ${state.category==='Kiyim'?'selected':''}>Kiyim</option>
-        <option value="Poyabzal" ${state.category==='Poyabzal'?'selected':''}>Poyabzal</option>
-        <option value="Aksessuar" ${state.category==='Aksessuar'?'selected':''}>Aksessuar</option>
-        <option value="Sport" ${state.category==='Sport'?'selected':''}>Sport</option>
-        <option value="Elektronika" ${state.category==='Elektronika'?'selected':''}>Elektronika</option>
-        <option value="Boshqa" ${state.category==='Boshqa'?'selected':''}>Boshqa</option>
-      </select>
-    </div>
-    <div class="edit-section-title">Narxlar</div>
-    <div class="input-group">
-      <label class="input-label">Tannarx (so'm)</label>
-      <input type="number" class="form-input" id="eBuyPrice" value="${state.buyPrice}">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Sotish narxi (so'm)</label>
-      <input type="number" class="form-input" id="eSellPrice" value="${state.sellPrice}">
-    </div>
-    <div class="edit-section-title">Qo'shimcha</div>
-    <div class="input-group">
-      <label class="input-label">Rang</label>
-      <input type="text" class="form-input" id="eColor" value="${state.color}">
-    </div>
-    <div class="input-group">
-      <label class="input-label">O'lcham</label>
-      <input type="text" class="form-input" id="eSize" value="${state.size}">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Tavsif</label>
-      <textarea class="form-input" id="eDesc" rows="3" style="resize:vertical;">${state.desc}</textarea>
-    </div>
-    <button class="modal-btn modal-btn-primary" onclick="doTahrir()">💾 Saqlash</button>
-    <button class="modal-btn modal-btn-secondary" onclick="closeActionModal()">Bekor qilish</button>
-  `);
-  }
-  function doTahrir() {
-    state.name = document.getElementById('eName').value || state.name;
-    state.code = document.getElementById('eCode').value || state.code;
-    state.category = document.getElementById('eCat').value;
-    state.buyPrice = parseInt(document.getElementById('eBuyPrice').value) || state.buyPrice;
-    state.sellPrice = parseInt(document.getElementById('eSellPrice').value) || state.sellPrice;
-    state.color = document.getElementById('eColor').value || state.color;
-    state.size = document.getElementById('eSize').value || state.size;
-    state.desc = document.getElementById('eDesc').value || state.desc;
-    updateAdminStats();
-    closeActionModal();
-    showToast('✅ Mahsulot yangilandi!');
-  }
-
-  // ── BOT ────────────────────────────
-  function openBot() {
-    openActionModal(`
-    <div class="modal-title">🤖 Telegram Bot</div>
-    <div class="modal-sub">Bot boshqaruvi</div>
-    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:0.82rem;color:var(--gray);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Bot holati</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);"></div>
-        <span style="font-weight:700;color:var(--green);">Faol</span>
-      </div>
-      <div style="font-size:0.85rem;color:var(--gray);line-height:1.8;">
-        🤖 Bot: <b style="color:var(--white)">@sariosiyo_bot</b><br>
-        📱 Kanal: <b style="color:var(--white)">@sariosiyo_online</b><br>
-        👥 Obunachlar: <b style="color:var(--white)">1,247</b>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <button class="admin-action-btn" onclick="botAction('Xabar yuborildi! 1247 ta foydalanuvchiga.')">📢 Xabar</button>
-      <button class="admin-action-btn" onclick="botAction('Statistika yangilandi.')">📊 Statistika</button>
-      <button class="admin-action-btn" onclick="botAction('Mahsulot yangilandi.')">🔄 Yangilash</button>
-      <button class="admin-action-btn" onclick="botAction('Sozlamalar ochildi.')">⚙️ Sozlamalar</button>
-    </div>
-    <a href="https://t.me/sariosiyo_online" target="_blank" class="btn btn-tg" style="margin-bottom:10px;">📲 Kanalga o'tish</a>
-    <button class="modal-btn modal-btn-secondary" onclick="closeActionModal()">Yopish</button>
-  `);
-  }
-  function botAction(msg) {
-    closeActionModal();
-    showToast('✅ ' + msg, 'success');
-  }
-
-  // ── TARIX ────────────────────────────
-  function openTarix() {
-    const items = state.history.map(h => `
-    <div class="history-item">
-      <div class="history-item-left">
-        <div style="font-weight:700;">${h.type === 'sell' ? '📤 Sotish' : '📥 Kirim'} — ${h.qty} ${state.unit}</div>
-        <div class="history-item-date">${h.date} · ${h.note}</div>
-      </div>
-      <div class="history-item-amount ${h.type === 'sell' ? 'green' : 'red'}">
-        ${h.type === 'sell' ? '+' : '-'}${fmt(h.total)} so'm
-      </div>
-    </div>
-  `).join('');
-    openActionModal(`
-    <div class="modal-title">📊 Operatsiya tarixi</div>
-    <div class="modal-sub">${state.history.length} ta operatsiya</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:12px;text-align:center;">
-        <div style="font-size:0.68rem;color:var(--gray);margin-bottom:4px;">JAMI SOTISH</div>
-        <div style="font-weight:700;color:var(--green)">${state.monthlySold} dona</div>
-      </div>
-      <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:12px;text-align:center;">
-        <div style="font-size:0.68rem;color:var(--gray);margin-bottom:4px;">JAMI DAROMAD</div>
-        <div style="font-weight:700;color:var(--blue)">${fmt(state.monthlyRevenue)}</div>
-      </div>
-    </div>
-    <div class="history-list">${items}</div>
-    <button class="modal-btn modal-btn-secondary" style="margin-top:10px;" onclick="closeActionModal()">Yopish</button>
-  `);
-  }
-
-  // ── CHIQARISH ────────────────────────
-  function chiqarishConfirm() {
-    showConfirm(
-            '🗑', 'Mahsulotni chiqarish',
-            'Bu mahsulot ro\'yxatdan o\'chiriladi. Tarix saqlanib qoladi. Tasdiqlaysizmi?',
-            () => {
-              closeConfirm();
-              showToast('✅ Mahsulot arxivlandi');
-              document.getElementById('adminPanel').classList.remove('show');
-              isAdmin = false;
-              document.querySelector('.product-card').style.opacity = '0.4';
-              document.querySelector('.product-card').style.filter = 'grayscale(0.7)';
-            }
-    );
-  }
-
-  // ══════════════════════════════════════
-  // CONFIRM DIALOG
-  // ══════════════════════════════════════
-  let confirmCallback = null;
-  function showConfirm(icon, title, msg, callback) {
-    document.getElementById('confirmIcon').textContent = icon;
-    document.getElementById('confirmTitle').textContent = title;
-    document.getElementById('confirmMsg').textContent = msg;
-    confirmCallback = callback;
-    document.getElementById('confirmOkBtn').onclick = callback;
-    document.getElementById('confirmOverlay').classList.add('open');
-  }
-  function closeConfirm() {
-    document.getElementById('confirmOverlay').classList.remove('open');
-  }
-
-  // ══════════════════════════════════════
-  // AUTO OPEN
-  // ══════════════════════════════════════
-  setTimeout(() => openModal(), 800);
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+$('serverUrlDisplay').textContent = API_URL;
+checkServer();
+setInterval(checkServer, 30000);
+startCam().then(startScanLoop);
 </script>
 </body>
 </html>
